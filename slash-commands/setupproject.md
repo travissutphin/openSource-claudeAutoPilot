@@ -1,20 +1,84 @@
 # [SetupProject] - New Project Setup
 
-**Version**: 2.1.0
+**Version**: 2.2.0
 **Command**: `[SetupProject]` or `/setupproject`
 **Trigger**: Run when starting a new project or when [StartDay] detects unconfigured project
-**Purpose**: Collect project info through questions and generate config files
+**Purpose**: Read PRD to extract project info, confirm with user, generate config files
 **Executor**: [Codey] (TPM) with [PRODUCT_OWNER]
 
 ---
 
 ## AUTO-EXECUTION INSTRUCTIONS
 
-**This is an INTERACTIVE workflow. Ask questions one section at a time, then generate files.**
+**This is a PRD-DRIVEN workflow. Look for PRD first, extract info, confirm, then generate files.**
 
 ---
 
-## STEP 1: Welcome & Basic Info
+## STEP 0: Check for PRD
+**Executor**: [Codey]
+
+### Search for PRD:
+```bash
+# Look for PRD in common locations
+PRD_LOCATIONS=(
+    "docs/prd/PRD.md"
+    "docs/PRD.md"
+    "PRD.md"
+    "docs/prd/*.md"
+    "*.prd.md"
+)
+
+# Check each location
+for loc in "${PRD_LOCATIONS[@]}"; do
+    if [ -f "$loc" ]; then
+        PRD_FILE="$loc"
+        break
+    fi
+done
+```
+
+### If PRD Found:
+```
+PROJECT SETUP
+==============
+
+I found your PRD: [PRD_FILE]
+
+Let me extract project information...
+
+EXTRACTED FROM PRD:
+-------------------
+- Project Name: [extracted from # heading or ## Overview]
+- Description: [extracted from Overview section]
+- Tech Stack: [extracted from ## Technical Requirements]
+- Database: [extracted from tech requirements]
+- Features: [count] features identified
+
+Is this correct? (yes / no / let me clarify)
+```
+
+If user says YES → Skip to STEP 1B (just ask for missing info like URLs, owner name)
+If user says NO → Proceed to STEP 1A (ask all questions manually)
+
+### If No PRD Found:
+```
+PROJECT SETUP
+==============
+
+No PRD found. You can either:
+
+1. Add your PRD to docs/prd/PRD.md and run [SetupProject] again
+2. Continue without PRD (I'll ask questions manually)
+
+Which would you prefer? (1 / 2)
+```
+
+If 1 → Wait for user to add PRD
+If 2 → Proceed to STEP 1A
+
+---
+
+## STEP 1A: Manual Setup (No PRD)
 **Executor**: [Codey]
 
 ### Check for Existing Setup:
@@ -33,8 +97,8 @@ fi
 
 ### Ask Basic Questions:
 ```
-PROJECT SETUP
-==============
+PROJECT SETUP (Manual Mode)
+============================
 
 Let's set up your project. I'll ask a few questions.
 
@@ -45,7 +109,35 @@ Let's set up your project. I'll ask a few questions.
 3. Brief description of what you're building?
 ```
 
-Wait for answers before proceeding.
+Wait for answers before proceeding to STEP 2.
+
+---
+
+## STEP 1B: PRD-Assisted Setup
+**Executor**: [Codey]
+
+### Ask Only Missing Info:
+```
+ADDITIONAL INFO NEEDED
+=======================
+
+I extracted most info from your PRD. Just need a few more details:
+
+1. What's your name? (You'll be the Product Owner)
+
+2. Local development URL?
+   Example: http://localhost:3000
+
+3. Production URL (if known)?
+   Example: https://myproject.com
+   (Type "unknown" if you don't have one yet)
+
+4. GitHub repository URL?
+   Example: https://github.com/username/project
+   (Type "later" to skip for now)
+```
+
+Skip to STEP 4 (Environment Variables) after answers.
 
 ---
 
@@ -358,6 +450,7 @@ Based on the primary language, set appropriate defaults:
 
 ## VERSION HISTORY
 
+- v2.2.0 (2025-12-25): PRD-driven setup - reads PRD first, extracts project info, confirms with user
 - v2.1.0 (2025-12-23): Added Step 8 - offers [SetupEnvironment] at end (user decides)
 - v2.0.0 (2025-12-22): Simplified universal setup - question-driven, no PRD parsing
 - v1.0.0 (2025-10-12): Initial release
@@ -365,5 +458,5 @@ Based on the primary language, set appropriate defaults:
 ---
 
 **Command Status**: PRODUCTION READY
-**Last Updated**: 2025-12-22
+**Last Updated**: 2025-12-25
 **Maintainer**: [Codey] (TPM)

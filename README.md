@@ -57,31 +57,28 @@ git clone https://github.com/travissutphin/openSource-claudeAutoPilot.git my-new
 cd my-new-project
 ```
 
-### 2. Open Claude Code
+### 2. Add Your PRD
+
+Place your PRD in the project first - it contains your project requirements:
+```
+docs/prd/PRD.md
+```
+
+See `examples/sample-prd-saas.md` for the expected format.
+
+### 3. Open Claude Code
 
 ```bash
 claude
 ```
 
-### 3. Run Setup
+### 4. Run Setup
 
 ```
 [SetupProject]
 ```
 
-Claude will ask you questions about your project and configure everything.
-
-### 4. Add Your PRD
-
-Place your PRD in the project:
-```
-docs/prd/PRD.md
-```
-
-Or tell Claude:
-```
-Here's my PRD: [paste or describe]
-```
+Claude reads your PRD and uses it to configure your project (name, tech stack, features). It will confirm or ask clarifying questions.
 
 ### 5. Start Building
 
@@ -89,7 +86,7 @@ Here's my PRD: [paste or describe]
 [StartDay]
 ```
 
-Claude reads your PRD, creates tasks, and guides you through implementation.
+Claude breaks your PRD into tasks on the kanban board and guides you through implementation.
 
 ---
 
@@ -278,47 +275,53 @@ Created by [Travis Sutphin](https://github.com/travissutphin)
 
 ### Phase 1: Project Initialization
 
-#### Step 1: Fork/Clone and Setup
+#### Step 1: Fork/Clone
 
 ```bash
 # Fork on GitHub, then clone your fork
 git clone https://github.com/YOUR-USERNAME/openSource-claudeAutoPilot.git my-project
 cd my-project
-
-# Open Claude Code
-claude
 ```
 
-#### Step 2: Run Project Setup
+#### Step 2: Add Your PRD
 
-Type:
+Create your PRD before running setup - it drives everything:
+```
+docs/prd/PRD.md
+```
+
+Your PRD should include: project name, description, tech stack, features with acceptance criteria, and out-of-scope items. See `examples/sample-prd-saas.md`.
+
+#### Step 3: Run Project Setup
+
+Open Claude Code and type:
 ```
 [SetupProject]
 ```
 
-Claude will ask:
+Claude reads your PRD and confirms:
 ```
 PROJECT SETUP
 ==============
 
-Let's set up your project. I'll ask a few questions.
+I found your PRD: docs/prd/PRD.md
 
-1. What's your name? (You'll be the Product Owner)
-2. What's the project name?
-3. Brief description of what you're building?
-4. What's your primary language/framework?
-5. Database (if any)?
-6. Local development URL?
-7. Production URL (if known)?
+Extracted from PRD:
+- Project: TaskFlow
+- Description: Task management SaaS for small teams
+- Tech Stack: Next.js 14, Tailwind CSS, PostgreSQL
+- Features: 7 identified
+
+Is this correct? (yes / no / let me clarify)
 ```
 
-After answering, Claude generates:
+After confirmation, Claude generates:
 - `CLAUDE.md` - AI instructions
 - `placeholders.json` - Project configuration
-- `kanban_dev.html` - Your kanban board
+- `kanban_dev.html` - Your kanban board with tasks from PRD
 - `.env.example` - Environment template
 
-#### Step 3: Environment Setup (Optional but Recommended)
+#### Step 4: Environment Setup (Optional but Recommended)
 
 When asked "Run [SetupEnvironment]?", say yes:
 
@@ -348,34 +351,11 @@ If yes, Claude:
 
 ---
 
-### Phase 2: PRD to Tasks
+### Phase 2: PRD Task Breakdown
 
-#### Step 4: Provide Your PRD
+#### How Claude Processes Your PRD
 
-Option A - File:
-```
-docs/prd/PRD.md
-```
-
-Option B - Conversation:
-```
-Here's my PRD:
-
-# My SaaS App
-
-## Overview
-A task management app for remote teams...
-
-## Features
-1. User authentication
-2. Team workspaces
-3. Task boards
-...
-```
-
-#### Step 5: AI Breaks Down PRD
-
-Claude analyzes your PRD and creates:
+When you run `[StartDay]` for the first time (or when PRD changes), Claude analyzes your PRD and creates tasks:
 
 ```
 PRD ANALYSIS COMPLETE
