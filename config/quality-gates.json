@@ -1,0 +1,257 @@
+{
+  "_version": "1.0.0",
+  "_description": "Quality gates that must pass before task progression. Auto gates run without human input.",
+  "_updated": "2025-12-23",
+
+  "ready_to_in_progress": {
+    "_description": "Starting work on a task",
+    "gates": [
+      {
+        "id": "task_assigned",
+        "name": "Task has assignee",
+        "auto": true,
+        "required": true,
+        "check_command": "grep -q 'data-assignee' kanban"
+      },
+      {
+        "id": "acceptance_criteria_defined",
+        "name": "Acceptance criteria exist",
+        "auto": true,
+        "required": true,
+        "check_command": "grep -q 'acceptance' task_description"
+      },
+      {
+        "id": "no_blockers",
+        "name": "No blocking dependencies",
+        "auto": true,
+        "required": true,
+        "check_command": "check_task_blockers"
+      }
+    ],
+    "on_pass": "auto_progress",
+    "on_fail": "notify_assignee"
+  },
+
+  "in_progress_to_review": {
+    "_description": "Developer done, ready for code review",
+    "gates": [
+      {
+        "id": "code_committed",
+        "name": "All changes committed",
+        "auto": true,
+        "required": true,
+        "check_command": "git status --porcelain | wc -l",
+        "pass_condition": "result === 0"
+      },
+      {
+        "id": "branch_pushed",
+        "name": "Branch pushed to remote",
+        "auto": true,
+        "required": true,
+        "check_command": "git rev-list @{u}..HEAD | wc -l",
+        "pass_condition": "result === 0"
+      },
+      {
+        "id": "tests_pass",
+        "name": "All tests passing",
+        "auto": true,
+        "required": true,
+        "check_command": "npm test",
+        "pass_condition": "exit_code === 0"
+      },
+      {
+        "id": "lint_pass",
+        "name": "No linting errors",
+        "auto": true,
+        "required": true,
+        "check_command": "npm run lint",
+        "pass_condition": "exit_code === 0"
+      },
+      {
+        "id": "no_secrets",
+        "name": "No exposed secrets",
+        "auto": true,
+        "required": true,
+        "blocking": true,
+        "check_command": "grep -rn 'api_key\\|secret\\|password' src/ --include='*.ts' --include='*.js' | grep -v '.env'",
+        "pass_condition": "result_count === 0"
+      },
+      {
+        "id": "no_debug_code",
+        "name": "No debug statements",
+        "auto": true,
+        "required": false,
+        "check_command": "grep -rn 'console.log\\|debugger\\|var_dump' src/",
+        "pass_condition": "result_count === 0",
+        "on_fail": "warn"
+      },
+      {
+        "id": "pr_created",
+        "name": "Pull request exists",
+        "auto": true,
+        "required": true,
+        "check_command": "gh pr view --json state -q '.state'",
+        "pass_condition": "result === 'OPEN'"
+      }
+    ],
+    "on_all_pass": "auto_progress",
+    "on_fail": "block_and_notify"
+  },
+
+  "review_to_qa": {
+    "_description": "Code review approved, ready for QA testing",
+    "gates": [
+      {
+        "id": "pr_approved",
+        "name": "PR has approval",
+        "auto": false,
+        "required": true,
+        "check_command": "gh pr view --json reviews -q '[.reviews[] | select(.state==\"APPROVED\")] | length'",
+        "pass_condition": "result >= 1",
+        "fallback": "ai_code_review"
+      },
+      {
+        "id": "ai_code_review",
+        "name": "AI code review passed",
+        "auto": true,
+        "required": true,
+        "check_command": "node automation/ai-code-review.js",
+        "pass_condition": "exit_code === 0"
+      },
+      {
+        "id": "security_scan",
+        "name": "Security scan passed",
+        "auto": true,
+        "required": true,
+        "blocking": true,
+        "check_command": "npm audit --audit-level=high",
+        "pass_condition": "exit_code === 0"
+      },
+      {
+        "id": "type_check",
+        "name": "TypeScript types valid",
+        "auto": true,
+        "required": true,
+        "check_command": "npm run type-check",
+        "pass_condition": "exit_code === 0",
+        "skip_if": "not_typescript_project"
+      },
+      {
+        "id": "build_succeeds",
+        "name": "Production build succeeds",
+        "auto": true,
+        "required": true,
+        "check_command": "npm run build",
+        "pass_condition": "exit_code === 0"
+      }
+    ],
+    "on_all_pass": "auto_progress",
+    "on_fail": "return_to_in_progress"
+  },
+
+  "qa_to_staging": {
+    "_description": "QA testing complete, ready for staging deployment",
+    "gates": [
+      {
+        "id": "test_cases_pass",
+        "name": "All QA test cases pass",
+        "auto": false,
+        "required": true,
+        "check_command": "check_qa_test_results",
+        "pass_condition": "all_passed"
+      },
+      {
+        "id": "no_critical_bugs",
+        "name": "No critical/high bugs open",
+        "auto": true,
+        "required": true,
+        "check_command": "check_bug_tracker",
+        "pass_condition": "critical_count === 0 && high_count === 0"
+      },
+      {
+        "id": "accessibility_check",
+        "name": "Accessibility scan passed",
+        "auto": true,
+        "required": false,
+        "check_command": "npm run a11y-check",
+        "pass_condition": "critical_issues === 0"
+      },
+      {
+        "id": "performance_baseline",
+        "name": "Performance within baseline",
+        "auto": true,
+        "required": false,
+        "check_command": "npm run perf-check",
+        "pass_condition": "degradation_percent < 20"
+      }
+    ],
+    "on_all_pass": "auto_progress",
+    "on_fail": "return_to_in_progress"
+  },
+
+  "staging_to_done": {
+    "_description": "Staging verified, ready for production",
+    "gates": [
+      {
+        "id": "staging_deployed",
+        "name": "Deployed to staging",
+        "auto": true,
+        "required": true,
+        "check_command": "curl -s -o /dev/null -w '%{http_code}' $STAGING_URL",
+        "pass_condition": "result === '200'"
+      },
+      {
+        "id": "staging_health_check",
+        "name": "Staging health check passes",
+        "auto": true,
+        "required": true,
+        "check_command": "curl -s $STAGING_URL/health",
+        "pass_condition": "status === 'healthy'"
+      },
+      {
+        "id": "staging_soak_time",
+        "name": "24-hour staging soak complete",
+        "auto": true,
+        "required": true,
+        "check_command": "check_staging_deploy_time",
+        "pass_condition": "hours_since_deploy >= 24",
+        "skip_if": "hotfix_flag"
+      },
+      {
+        "id": "no_staging_errors",
+        "name": "No errors in staging logs",
+        "auto": true,
+        "required": true,
+        "check_command": "check_staging_error_logs",
+        "pass_condition": "error_count === 0"
+      },
+      {
+        "id": "product_owner_approval",
+        "name": "Product Owner approval",
+        "auto": false,
+        "required": true,
+        "decision_type": "await_decision",
+        "timeout_hours": 48
+      }
+    ],
+    "on_all_pass": "deploy_to_production",
+    "on_fail": "hold_and_notify"
+  },
+
+  "hotfix_override": {
+    "_description": "Emergency hotfix bypasses some gates",
+    "requires_approval": true,
+    "approval_from": ["[PRODUCT_OWNER]", "[Syntax]", "[Flow]"],
+    "skippable_gates": [
+      "staging_soak_time",
+      "accessibility_check",
+      "performance_baseline"
+    ],
+    "mandatory_gates": [
+      "tests_pass",
+      "no_secrets",
+      "security_scan",
+      "staging_health_check"
+    ]
+  }
+}

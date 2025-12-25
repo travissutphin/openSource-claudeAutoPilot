@@ -1,0 +1,116 @@
+{
+  "_version": "1.0.0",
+  "_description": "Defines what AI can do autonomously vs what requires human decision",
+  "_updated": "2025-12-23",
+
+  "auto_execute": {
+    "_description": "AI executes without notification - routine operational tasks",
+    "actions": [
+      "kanban_card_movement",
+      "branch_creation",
+      "branch_deletion_merged",
+      "test_execution",
+      "lint_and_format",
+      "dependency_updates_patch",
+      "documentation_sync",
+      "sitemap_regeneration",
+      "cache_clear",
+      "log_rotation",
+      "backup_creation",
+      "health_check_execution",
+      "metrics_collection",
+      "code_formatting",
+      "import_sorting",
+      "dead_code_removal_obvious"
+    ]
+  },
+
+  "auto_execute_notify": {
+    "_description": "AI executes automatically but includes in daily digest",
+    "actions": [
+      "staging_deployment",
+      "database_migration_non_destructive",
+      "dependency_updates_minor",
+      "security_scan_passed",
+      "qa_tests_completed",
+      "code_review_ai_approved",
+      "performance_benchmark_passed",
+      "accessibility_scan_completed",
+      "seo_audit_completed",
+      "sprint_velocity_calculated"
+    ]
+  },
+
+  "await_decision": {
+    "_description": "AI prepares recommendation and queues for human decision",
+    "actions": [
+      "production_deployment",
+      "database_migration_destructive",
+      "dependency_updates_major",
+      "new_feature_scope_change",
+      "architectural_decision",
+      "third_party_service_integration",
+      "api_breaking_change",
+      "security_vulnerability_medium",
+      "performance_degradation_detected",
+      "budget_threshold_exceeded",
+      "timeline_extension_needed",
+      "vendor_selection",
+      "technology_stack_change",
+      "user_data_schema_change",
+      "pricing_or_billing_change",
+      "legal_terms_update"
+    ],
+    "sla_hours": 24,
+    "reminder_after_hours": 12
+  },
+
+  "escalate_immediately": {
+    "_description": "AI notifies immediately via all channels - critical issues",
+    "actions": [
+      "security_vulnerability_critical",
+      "security_breach_detected",
+      "production_down",
+      "data_loss_detected",
+      "data_breach_suspected",
+      "compliance_violation",
+      "legal_issue_detected",
+      "payment_system_failure",
+      "ssl_certificate_expiring_24h",
+      "database_corruption",
+      "backup_failure_critical"
+    ],
+    "notification_channels": ["sms", "email", "slack"],
+    "repeat_until_acknowledged": true,
+    "repeat_interval_minutes": 15
+  },
+
+  "delegation_rules": {
+    "_description": "Who handles what when Product Owner unavailable",
+    "security_issues": "[Sentinal]",
+    "infrastructure_issues": "[Flow]",
+    "code_quality_issues": "[Syntax]",
+    "qa_issues": "[Verity]",
+    "content_issues": "[Echo]",
+    "default_fallback": "[Codey]"
+  },
+
+  "approval_thresholds": {
+    "_description": "Numeric thresholds that trigger decision requests",
+    "budget_variance_percent": 10,
+    "timeline_variance_days": 2,
+    "performance_degradation_percent": 20,
+    "test_coverage_minimum_percent": 70,
+    "security_scan_max_medium_issues": 3,
+    "dependency_age_max_major_versions": 2
+  },
+
+  "quiet_hours": {
+    "_description": "Non-urgent notifications held until active hours",
+    "enabled": true,
+    "start": "22:00",
+    "end": "08:00",
+    "timezone": "America/Chicago",
+    "exceptions": ["escalate_immediately"]
+  }
+}

@@ -1,0 +1,50 @@
+---
+title: "[BLOG_TITLE]"
+slug: "[BLOG_SLUG]"
+date: "[YYYY-MM-DD]"
+author: "[AUTHOR_NAME]"
+description: "[META_DESCRIPTION - 150-160 characters for SEO]"
+keywords: "[keyword1], [keyword2], [keyword3]"
+category: "[CATEGORY]"
+tags: ["[tag1]", "[tag2]", "[tag3]"]
+image: "/assets/images/blogs/[YYYY-MM-DD]-[BLOG_SLUG].png"
+image_alt: "[IMAGE_ALT_TEXT]"
+featured: false
+draft: false
+---
+
+# [BLOG_TITLE]
+
+[HOOK - Opening paragraph that captures attention and establishes the problem or opportunity]
+
+## The Problem
+
+[Describe the challenge your reader faces]
+
+## The Solution
+
+[Present your solution or key insight]
+
+### Key Point 1
+
+[Expand on first major point]
+
+### Key Point 2
+
+[Expand on second major point]
+
+### Key Point 3
+
+[Expand on third major point]
+
+## Practical Application
+
+[How readers can apply this information]
+
+## Conclusion
+
+[Summarize key takeaways and call-to-action]
+
+---
+
+**Ready to [desired action]?** [Call-to-action with link or next step]

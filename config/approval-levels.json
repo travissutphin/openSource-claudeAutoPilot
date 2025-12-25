@@ -1,0 +1,130 @@
+{
+  "_comment": "Define what requires [PRODUCT_OWNER] approval vs automatic execution",
+  "_version": "1.0.0",
+  "_philosophy": "High-level decisions need human approval, routine tasks execute automatically",
+
+  "requires_product_owner_approval": {
+    "strategic_decisions": [
+      "architectural_changes",
+      "new_feature_planning",
+      "major_refactoring",
+      "tech_stack_changes",
+      "budget_decisions",
+      "timeline_commitments",
+      "third_party_integrations",
+      "database_schema_changes"
+    ],
+    "content_decisions": [
+      "brand_messaging_changes",
+      "major_content_strategy_shifts",
+      "new_blog_categories",
+      "marketing_campaign_launches"
+    ],
+    "operational_decisions": [
+      "team_structure_changes",
+      "process_workflow_overhauls",
+      "deployment_strategy_changes",
+      "security_policy_updates"
+    ]
+  },
+
+  "auto_execute_by_ai": {
+    "development_tasks": [
+      "kanban_updates",
+      "git_commits",
+      "code_formatting",
+      "dependency_updates_minor",
+      "sitemap_refresh",
+      "deployment_logs",
+      "documentation_updates",
+      "test_execution"
+    ],
+    "content_tasks": [
+      "blog_post_formatting",
+      "image_optimization",
+      "metadata_generation",
+      "internal_linking",
+      "content_archiving"
+    ],
+    "operational_tasks": [
+      "standup_reports",
+      "task_status_updates",
+      "performance_monitoring",
+      "backup_verification",
+      "security_scans_routine"
+    ]
+  },
+
+  "requires_team_member_approval": {
+    "_comment": "Specific team roles that must approve certain actions",
+    "security": {
+      "approver": "[SECURITY_SPECIALIST]",
+      "requires_approval": [
+        "dependency_updates_major",
+        "authentication_changes",
+        "api_key_rotation",
+        "cors_policy_changes"
+      ]
+    },
+    "devops": {
+      "approver": "[DEVOPS_ENGINEER]",
+      "requires_approval": [
+        "production_deployments",
+        "infrastructure_changes",
+        "ci_cd_pipeline_modifications"
+      ]
+    },
+    "design": {
+      "approver": "[DESIGNER]",
+      "requires_approval": [
+        "brand_color_changes",
+        "typography_changes",
+        "layout_structural_changes"
+      ]
+    }
+  },
+
+  "approval_workflow": {
+    "_comment": "How to request approval when needed",
+    "method": "slash_command",
+    "command_format": "[RequestApproval:CATEGORY]",
+    "example": "[RequestApproval:architectural_changes]",
+    "ai_behavior": {
+      "when_approval_needed": "Stop execution, present decision to [PRODUCT_OWNER], await response",
+      "when_auto_execute": "Execute immediately, log action, report completion",
+      "when_uncertain": "Default to requesting approval (safer)"
+    }
+  },
+
+  "escalation_rules": {
+    "rule_1": "If task impacts production users → require approval",
+    "rule_2": "If task is reversible → auto-execute",
+    "rule_3": "If task costs money → require approval",
+    "rule_4": "If task affects multiple team members → require approval",
+    "rule_5": "If task is routine maintenance → auto-execute",
+    "rule_6": "When in doubt → request approval"
+  },
+
+  "_example_scenarios": {
+    "scenario_1": {
+      "action": "Update kanban card from Sprint → Done",
+      "category": "auto_execute",
+      "reason": "Routine task, documented in git history, reversible"
+    },
+    "scenario_2": {
+      "action": "Change primary database to PostgreSQL",
+      "category": "requires_product_owner_approval",
+      "reason": "Major architectural decision, impacts entire team, not reversible"
+    },
+    "scenario_3": {
+      "action": "Fix typo in blog post",
+      "category": "auto_execute",
+      "reason": "Minor content change, no strategic impact, easily reversible"
+    },
+    "scenario_4": {
+      "action": "Change brand colors from green to red",
+      "category": "requires_product_owner_approval",
+      "reason": "Major brand decision, affects user perception, requires stakeholder input"
+    }
+  }
+}

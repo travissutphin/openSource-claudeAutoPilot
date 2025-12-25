@@ -1,0 +1,235 @@
+{
+  "_comment": "Replace these placeholders when setting up framework in a new project",
+  "_version": "2.0.0",
+  "_updated": "2025-12-23",
+
+  "project": {
+    "name": "[PROJECT_NAME]",
+    "description": "[PROJECT_DESCRIPTION]",
+    "repository": "[GITHUB_REPO_URL]",
+    "production_url": "[PRODUCTION_URL]",
+    "staging_url": "[STAGING_URL]",
+    "local_url": "[LOCAL_DEV_URL]"
+  },
+
+  "tech_stack": {
+    "primary_language": "[PRIMARY_LANGUAGE]",
+    "css_framework": "[CSS_FRAMEWORK]",
+    "server_type": "[SERVER_TYPE]",
+    "deployment_platform": "[DEPLOYMENT_PLATFORM]",
+    "port": "[SERVER_PORT]",
+    "database": "[DATABASE_TYPE]",
+    "orm": "[ORM_TYPE]"
+  },
+
+  "team": {
+    "product_owner": "[PRODUCT_OWNER_NAME]",
+    "product_owner_email": "[PRODUCT_OWNER_EMAIL]",
+    "tpm": "Codey",
+    "principal_engineer": "Syntax",
+    "designer": "Aesthetica",
+    "devops": "Flow",
+    "qa": "Verity",
+    "security": "Sentinal",
+    "marketing_seo": "Bran",
+    "content_strategist": "Echo",
+    "storybrand_expert": "Cipher"
+  },
+
+  "paths": {
+    "docs_root": "[DOCS_ROOT_PATH]",
+    "kanban_dev": "[KANBAN_DEV_PATH]",
+    "kanban_content": "[KANBAN_CONTENT_PATH]",
+    "content_blog": "[BLOG_CONTENT_PATH]",
+    "public_root": "[PUBLIC_ROOT_PATH]",
+    "automation": "[AUTOMATION_PATH]",
+    "decisions": "[DOCS_ROOT_PATH]/decisions"
+  },
+
+  "git": {
+    "main_branch": "[MAIN_BRANCH_NAME]",
+    "staging_branch": "staging",
+    "feature_prefix": "[FEATURE_BRANCH_PREFIX]"
+  },
+
+  "environments": {
+    "local": {
+      "url": "[LOCAL_DEV_URL]",
+      "port": "[SERVER_PORT]",
+      "start_command": "[DEV_SERVER_COMMAND]",
+      "database_url": "[DATABASE_URL_LOCAL]"
+    },
+    "staging": {
+      "url": "[STAGING_URL]",
+      "branch": "staging",
+      "auto_deploy": true,
+      "database_url": "[DATABASE_URL_STAGING]",
+      "basic_auth_user": "[STAGING_AUTH_USER]",
+      "basic_auth_pass": "[STAGING_AUTH_PASS]"
+    },
+    "production": {
+      "url": "[PRODUCTION_URL]",
+      "branch": "main",
+      "auto_deploy": false,
+      "requires_approval": true,
+      "database_url": "[DATABASE_URL_PRODUCTION]",
+      "cdn_url": "[CDN_URL]"
+    }
+  },
+
+  "autonomous_operations": {
+    "_comment": "Settings for AI autonomous operation mode",
+    "enabled": true,
+
+    "monitor": {
+      "enabled": true,
+      "interval_minutes": 30,
+      "run_on_startup": true,
+      "environments_to_check": ["local", "staging", "production"]
+    },
+
+    "auto_progression": {
+      "enabled": true,
+      "require_all_tests_pass": true,
+      "require_security_scan": true,
+      "staging_soak_hours": 24
+    },
+
+    "decisions": {
+      "queue_file": "docs/decisions/pending.md",
+      "archive_folder": "docs/decisions/archive",
+      "reminder_after_hours": 12,
+      "escalate_after_hours": 48
+    },
+
+    "notifications": {
+      "digest_enabled": true,
+      "digest_time": "09:00",
+      "digest_channel": "email",
+      "digest_recipients": ["[PRODUCT_OWNER_EMAIL]"],
+      "escalation_channel": "sms",
+      "quiet_hours_start": "22:00",
+      "quiet_hours_end": "08:00",
+      "timezone": "America/Chicago"
+    }
+  },
+
+  "setup_tasks": {
+    "_comment": "Track required setup steps - checked on every [StartDay]",
+    "env_file": {
+      "required": false,
+      "variables": []
+    },
+    "git_init": {
+      "required": false,
+      "remote_url": ""
+    },
+    "dependencies": {
+      "required": false,
+      "command": ""
+    },
+    "database": {
+      "required": false,
+      "migration_command": ""
+    },
+    "dev_server": {
+      "command": ""
+    }
+  },
+
+  "quality_thresholds": {
+    "_comment": "Quality gate thresholds for autonomous decisions",
+    "test_coverage_minimum": 70,
+    "max_critical_vulnerabilities": 0,
+    "max_high_vulnerabilities": 0,
+    "max_medium_vulnerabilities": 5,
+    "performance_degradation_max_percent": 20,
+    "staging_soak_min_hours": 24
+  },
+
+  "_example_values": {
+    "_comment": "Example from travissutphin.com project",
+    "project": {
+      "name": "travissutphin.com",
+      "description": "AI-powered portfolio and blog platform",
+      "repository": "https://github.com/travissutphin/travissutphin.com",
+      "production_url": "https://travissutphin.com",
+      "staging_url": "https://staging.travissutphin.com",
+      "local_url": "http://localhost:80"
+    },
+    "tech_stack": {
+      "primary_language": "PHP 8+",
+      "css_framework": "Tailwind CSS",
+      "server_type": "XAMPP",
+      "deployment_platform": "Railway",
+      "port": "80",
+      "database": "PostgreSQL",
+      "orm": "none"
+    },
+    "team": {
+      "product_owner": "Travis",
+      "product_owner_email": "travis@example.com",
+      "tpm": "Codey",
+      "principal_engineer": "Syntax",
+      "designer": "Aesthetica",
+      "devops": "Flow",
+      "qa": "Verity",
+      "security": "Sentinal",
+      "marketing_seo": "Bran",
+      "content_strategist": "Echo",
+      "storybrand_expert": "Cipher"
+    },
+    "paths": {
+      "docs_root": "/docs",
+      "kanban_dev": "/docs/kanban/kanban_dev.html",
+      "kanban_content": "/docs/kanban/kanban_content.html",
+      "content_blog": "/content/blog",
+      "public_root": "/public",
+      "automation": "/automation",
+      "decisions": "/docs/decisions"
+    },
+    "git": {
+      "main_branch": "main",
+      "staging_branch": "staging",
+      "feature_prefix": "feature/"
+    },
+    "environments": {
+      "local": {
+        "url": "http://localhost:80",
+        "port": "80",
+        "start_command": "XAMPP Apache start",
+        "database_url": "postgresql://localhost:5432/travissutphin_dev"
+      },
+      "staging": {
+        "url": "https://staging.travissutphin.com",
+        "branch": "staging",
+        "auto_deploy": true,
+        "database_url": "postgresql://staging-db:5432/travissutphin_staging"
+      },
+      "production": {
+        "url": "https://travissutphin.com",
+        "branch": "main",
+        "auto_deploy": false,
+        "requires_approval": true,
+        "database_url": "postgresql://prod-db:5432/travissutphin_prod",
+        "cdn_url": "https://cdn.travissutphin.com"
+      }
+    },
+    "autonomous_operations": {
+      "enabled": true,
+      "monitor": {
+        "enabled": true,
+        "interval_minutes": 30,
+        "run_on_startup": true,
+        "environments_to_check": ["local", "staging", "production"]
+      },
+      "notifications": {
+        "digest_enabled": true,
+        "digest_time": "09:00",
+        "digest_channel": "email",
+        "digest_recipients": ["travis@example.com"],
+        "timezone": "America/Chicago"
+      }
+    }
+  }
+}

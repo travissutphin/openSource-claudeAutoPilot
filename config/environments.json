@@ -1,0 +1,346 @@
+{
+  "_version": "1.0.0",
+  "_description": "Environment configuration for local, staging, and production deployments",
+  "_updated": "2025-12-23",
+
+  "environments": {
+    "local": {
+      "name": "Local Development",
+      "type": "development",
+      "url": "[LOCAL_URL]",
+      "port": "[LOCAL_PORT]",
+      "health_endpoint": "/health",
+      "debug_enabled": true,
+      "ssl_required": false,
+
+      "server": {
+        "type": "[SERVER_TYPE]",
+        "start_command": "[DEV_SERVER_COMMAND]",
+        "stop_command": "[DEV_SERVER_STOP]",
+        "log_file": "logs/dev.log"
+      },
+
+      "database": {
+        "type": "[DATABASE_TYPE]",
+        "host": "localhost",
+        "port": "[DATABASE_PORT]",
+        "name": "[DATABASE_NAME]_dev",
+        "connection_string": "[DATABASE_CONNECTION_LOCAL]"
+      },
+
+      "features": {
+        "hot_reload": true,
+        "source_maps": true,
+        "verbose_logging": true,
+        "mock_services": true
+      },
+
+      "deployment": {
+        "method": "manual",
+        "command": null
+      }
+    },
+
+    "staging": {
+      "name": "Staging Environment",
+      "type": "staging",
+      "url": "[STAGING_URL]",
+      "health_endpoint": "/health",
+      "debug_enabled": false,
+      "ssl_required": true,
+
+      "server": {
+        "type": "[SERVER_TYPE]",
+        "platform": "[DEPLOYMENT_PLATFORM]",
+        "region": "[DEPLOYMENT_REGION]"
+      },
+
+      "database": {
+        "type": "[DATABASE_TYPE]",
+        "host": "[DATABASE_HOST_STAGING]",
+        "name": "[DATABASE_NAME]_staging",
+        "connection_string": "[DATABASE_CONNECTION_STAGING]",
+        "ssl_mode": "require"
+      },
+
+      "features": {
+        "hot_reload": false,
+        "source_maps": true,
+        "verbose_logging": true,
+        "mock_services": false,
+        "feature_flags": true
+      },
+
+      "deployment": {
+        "method": "git_push",
+        "branch": "staging",
+        "auto_deploy": true,
+        "pre_deploy_checks": [
+          "npm run build",
+          "npm run test",
+          "npm audit --audit-level=high"
+        ],
+        "post_deploy_checks": [
+          "health_check",
+          "smoke_test"
+        ],
+        "rollback_command": "git revert HEAD && git push origin staging"
+      },
+
+      "monitoring": {
+        "health_check_interval_seconds": 60,
+        "alert_on_error": true,
+        "log_retention_days": 14
+      },
+
+      "access": {
+        "ip_whitelist": [],
+        "basic_auth": true,
+        "basic_auth_user": "[STAGING_AUTH_USER]",
+        "basic_auth_pass": "[STAGING_AUTH_PASS]"
+      }
+    },
+
+    "production": {
+      "name": "Production Environment",
+      "type": "production",
+      "url": "[PRODUCTION_URL]",
+      "health_endpoint": "/health",
+      "debug_enabled": false,
+      "ssl_required": true,
+
+      "server": {
+        "type": "[SERVER_TYPE]",
+        "platform": "[DEPLOYMENT_PLATFORM]",
+        "region": "[DEPLOYMENT_REGION]",
+        "cdn_enabled": true,
+        "cdn_url": "[CDN_URL]"
+      },
+
+      "database": {
+        "type": "[DATABASE_TYPE]",
+        "host": "[DATABASE_HOST_PRODUCTION]",
+        "name": "[DATABASE_NAME]_prod",
+        "connection_string": "[DATABASE_CONNECTION_PRODUCTION]",
+        "ssl_mode": "require",
+        "read_replicas": [],
+        "backup_enabled": true,
+        "backup_schedule": "daily:03:00"
+      },
+
+      "features": {
+        "hot_reload": false,
+        "source_maps": false,
+        "verbose_logging": false,
+        "mock_services": false,
+        "feature_flags": true,
+        "analytics_enabled": true,
+        "error_tracking_enabled": true
+      },
+
+      "deployment": {
+        "method": "git_push",
+        "branch": "main",
+        "auto_deploy": false,
+        "requires_approval": true,
+        "approval_from": ["[PRODUCT_OWNER]"],
+        "pre_deploy_checks": [
+          "npm run build",
+          "npm run test",
+          "npm audit --audit-level=critical",
+          "check_staging_soak_time"
+        ],
+        "post_deploy_checks": [
+          "health_check",
+          "smoke_test",
+          "performance_baseline"
+        ],
+        "rollback_command": "git revert HEAD && git push origin main",
+        "rollback_window_hours": 24
+      },
+
+      "monitoring": {
+        "health_check_interval_seconds": 30,
+        "alert_on_error": true,
+        "alert_channels": ["email", "sms"],
+        "uptime_target_percent": 99.9,
+        "log_retention_days": 90,
+        "metrics_retention_days": 365
+      },
+
+      "security": {
+        "waf_enabled": true,
+        "ddos_protection": true,
+        "ssl_min_version": "TLS1.2",
+        "hsts_enabled": true,
+        "csp_enabled": true
+      },
+
+      "scaling": {
+        "auto_scale": true,
+        "min_instances": 1,
+        "max_instances": 10,
+        "scale_up_threshold_cpu": 70,
+        "scale_down_threshold_cpu": 30
+      }
+    }
+  },
+
+  "common": {
+    "_description": "Settings shared across all environments",
+
+    "health_check": {
+      "endpoint": "/health",
+      "expected_status": 200,
+      "timeout_ms": 5000,
+      "checks": [
+        {"name": "database", "required": true},
+        {"name": "cache", "required": false},
+        {"name": "external_apis", "required": false}
+      ]
+    },
+
+    "logging": {
+      "format": "json",
+      "levels": ["error", "warn", "info", "debug"],
+      "exclude_paths": ["/health", "/favicon.ico"],
+      "mask_fields": ["password", "token", "api_key", "secret"]
+    },
+
+    "cors": {
+      "allowed_origins": ["[LOCAL_URL]", "[STAGING_URL]", "[PRODUCTION_URL]"],
+      "allowed_methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      "allowed_headers": ["Content-Type", "Authorization"],
+      "max_age_seconds": 86400
+    },
+
+    "rate_limiting": {
+      "enabled": true,
+      "requests_per_minute": 100,
+      "burst_limit": 150
+    }
+  },
+
+  "deployment_platforms": {
+    "_description": "Platform-specific deployment configurations",
+
+    "vercel": {
+      "config_file": "vercel.json",
+      "deploy_command": "vercel --prod",
+      "preview_command": "vercel",
+      "environment_variables": "Vercel Dashboard"
+    },
+
+    "railway": {
+      "config_file": "railway.json",
+      "deploy_command": "railway up",
+      "preview_command": "railway up --environment staging",
+      "environment_variables": "Railway Dashboard"
+    },
+
+    "heroku": {
+      "config_file": "Procfile",
+      "deploy_command": "git push heroku main",
+      "preview_command": "git push heroku-staging staging:main",
+      "environment_variables": "heroku config:set"
+    },
+
+    "aws": {
+      "config_file": "serverless.yml",
+      "deploy_command": "serverless deploy --stage prod",
+      "preview_command": "serverless deploy --stage staging",
+      "environment_variables": "AWS Parameter Store / Secrets Manager"
+    },
+
+    "digitalocean": {
+      "config_file": ".do/app.yaml",
+      "deploy_command": "doctl apps create-deployment",
+      "preview_command": "doctl apps create-deployment --staging",
+      "environment_variables": "App Platform Settings"
+    },
+
+    "manual": {
+      "config_file": null,
+      "deploy_command": "[MANUAL_DEPLOY_COMMAND]",
+      "preview_command": "[MANUAL_PREVIEW_COMMAND]",
+      "environment_variables": ".env files"
+    }
+  },
+
+  "environment_variables": {
+    "_description": "Required environment variables by environment",
+
+    "all": [
+      "NODE_ENV",
+      "APP_URL",
+      "DATABASE_URL"
+    ],
+
+    "local_only": [
+      "DEBUG"
+    ],
+
+    "staging_production": [
+      "SESSION_SECRET",
+      "API_KEY",
+      "ENCRYPTION_KEY"
+    ],
+
+    "production_only": [
+      "SENTRY_DSN",
+      "ANALYTICS_ID",
+      "CDN_URL"
+    ]
+  },
+
+  "smoke_tests": {
+    "_description": "Quick tests to verify deployment success",
+
+    "tests": [
+      {
+        "name": "Homepage loads",
+        "method": "GET",
+        "path": "/",
+        "expected_status": 200
+      },
+      {
+        "name": "Health check",
+        "method": "GET",
+        "path": "/health",
+        "expected_status": 200,
+        "expected_body_contains": "healthy"
+      },
+      {
+        "name": "API responds",
+        "method": "GET",
+        "path": "/api/status",
+        "expected_status": 200
+      },
+      {
+        "name": "Static assets load",
+        "method": "GET",
+        "path": "/assets/main.css",
+        "expected_status": 200
+      }
+    ]
+  },
+
+  "promotion_workflow": {
+    "_description": "How code moves between environments",
+
+    "flow": "local → staging → production",
+
+    "local_to_staging": {
+      "trigger": "PR merged to staging branch",
+      "auto_deploy": true,
+      "gates": ["tests_pass", "security_scan"]
+    },
+
+    "staging_to_production": {
+      "trigger": "PR merged to main branch",
+      "auto_deploy": false,
+      "gates": ["tests_pass", "security_scan", "staging_soak_24h", "product_owner_approval"],
+      "soak_time_hours": 24
+    }
+  }
+}

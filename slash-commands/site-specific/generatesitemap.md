@@ -1,0 +1,361 @@
+# [GenerateSitemap] - Sitemap Generation Automation
+
+**Version**: 1.0.0
+**Command**: `[GenerateSitemap]` or `/generatesitemap`
+**Type**: SITE-SPECIFIC (customize per project)
+**Trigger**: Type after adding new content or pages
+**Purpose**: Regenerate XML sitemap with all current pages
+**Executor**: [Bran] (SEO Lead), [Syntax] (Technical)
+
+---
+
+## AUTO-EXECUTION INSTRUCTIONS
+
+**You are now executing the Sitemap Generation workflow. This scans content and regenerates sitemap.xml.**
+
+---
+
+## STEP 1: Scan Content Directories
+**Executor**: [Syntax] (Lead)
+
+### Scan Actions:
+```bash
+# Configuration
+PUBLIC_ROOT="[PUBLIC_ROOT_PATH]"
+CONTENT_ROOT="[CONTENT_ROOT_PATH]"
+PRODUCTION_URL="[PRODUCTION_URL]"
+SITEMAP_PATH="$PUBLIC_ROOT/sitemap.xml"
+
+# Find all content pages
+echo "Scanning content directories..."
+
+# Blog posts
+BLOG_POSTS=$(find "$CONTENT_ROOT/blog" -name "*.md" -type f 2>/dev/null)
+
+# Static pages
+STATIC_PAGES=$(find "$PUBLIC_ROOT" -name "*.php" -type f ! -path "*/includes/*" 2>/dev/null)
+
+# Case studies (if applicable)
+CASE_STUDIES=$(find "$CONTENT_ROOT/case-studies" -name "*.md" -type f 2>/dev/null)
+
+echo "Found:"
+echo "  - Blog posts: $(echo "$BLOG_POSTS" | wc -l)"
+echo "  - Static pages: $(echo "$STATIC_PAGES" | wc -l)"
+echo "  - Case studies: $(echo "$CASE_STUDIES" | wc -l)"
+```
+
+---
+
+## STEP 2: Generate Sitemap XML
+**Executor**: [Syntax] (Lead)
+
+### Generate sitemap.xml:
+```bash
+# Start XML
+cat > "$SITEMAP_PATH" << 'XMLHEADER'
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+XMLHEADER
+
+# Add homepage
+cat >> "$SITEMAP_PATH" << EOF
+  <url>
+    <loc>$PRODUCTION_URL/</loc>
+    <lastmod>$(date +%Y-%m-%d)</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+EOF
+
+# Add static pages
+PRIORITY_PAGES=("about" "services" "contact" "portfolio" "blog")
+for PAGE in "${PRIORITY_PAGES[@]}"; do
+    if [ -f "$PUBLIC_ROOT/$PAGE.php" ] || [ -f "$PUBLIC_ROOT/$PAGE/index.php" ]; then
+        cat >> "$SITEMAP_PATH" << EOF
+  <url>
+    <loc>$PRODUCTION_URL/$PAGE</loc>
+    <lastmod>$(date +%Y-%m-%d)</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+EOF
+    fi
+done
+
+# Add blog posts
+for POST in $BLOG_POSTS; do
+    # Extract slug from filename (YYYY-MM-DD-slug.md)
+    FILENAME=$(basename "$POST" .md)
+    SLUG=$(echo "$FILENAME" | sed 's/^[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}-//')
+    POST_DATE=$(echo "$FILENAME" | grep -oP '^\d{4}-\d{2}-\d{2}')
+
+    cat >> "$SITEMAP_PATH" << EOF
+  <url>
+    <loc>$PRODUCTION_URL/blog/$SLUG</loc>
+    <lastmod>$POST_DATE</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.6</priority>
+  </url>
+EOF
+done
+
+# Add case studies
+for STUDY in $CASE_STUDIES; do
+    FILENAME=$(basename "$STUDY" .md)
+    SLUG=$(echo "$FILENAME" | sed 's/^[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}-//')
+    POST_DATE=$(echo "$FILENAME" | grep -oP '^\d{4}-\d{2}-\d{2}')
+
+    cat >> "$SITEMAP_PATH" << EOF
+  <url>
+    <loc>$PRODUCTION_URL/case-studies/$SLUG</loc>
+    <lastmod>$POST_DATE</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>
+EOF
+done
+
+# Close XML
+echo "</urlset>" >> "$SITEMAP_PATH"
+
+echo "Sitemap generated at: $SITEMAP_PATH"
+```
+
+---
+
+## STEP 3: Validate Sitemap
+**Executor**: [Verity] (Lead)
+
+### Validation Checks:
+```bash
+# 1. Check XML syntax
+xmllint --noout "$SITEMAP_PATH" 2>&1
+if [ $? -eq 0 ]; then
+    echo "XML Validation: PASSED"
+else
+    echo "XML Validation: FAILED"
+fi
+
+# 2. Count URLs
+URL_COUNT=$(grep -c '<url>' "$SITEMAP_PATH")
+echo "Total URLs: $URL_COUNT"
+
+# 3. Check for duplicates
+DUPLICATE_COUNT=$(grep '<loc>' "$SITEMAP_PATH" | sort | uniq -d | wc -l)
+if [ $DUPLICATE_COUNT -eq 0 ]; then
+    echo "Duplicate Check: PASSED"
+else
+    echo "Duplicate Check: FAILED ($DUPLICATE_COUNT duplicates)"
+fi
+
+# 4. Verify URLs are accessible (sample check)
+SAMPLE_URL=$(grep '<loc>' "$SITEMAP_PATH" | head -5 | tail -1 | grep -oP '<loc>\K[^<]+')
+HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$SAMPLE_URL")
+echo "Sample URL Check: $SAMPLE_URL (HTTP $HTTP_STATUS)"
+```
+
+### Validation Report:
+```
+SITEMAP VALIDATION:
+===================
+[ ] XML syntax valid
+[ ] No duplicate URLs
+[ ] All URLs accessible
+[ ] File size under 50MB
+[ ] Under 50,000 URLs
+```
+
+---
+
+## STEP 4: Update robots.txt
+**Executor**: [Syntax] (Lead)
+
+### Ensure sitemap reference:
+```bash
+ROBOTS_PATH="$PUBLIC_ROOT/robots.txt"
+
+# Check if sitemap line exists
+if ! grep -q "Sitemap:" "$ROBOTS_PATH" 2>/dev/null; then
+    echo "" >> "$ROBOTS_PATH"
+    echo "Sitemap: $PRODUCTION_URL/sitemap.xml" >> "$ROBOTS_PATH"
+    echo "Added sitemap reference to robots.txt"
+else
+    echo "Sitemap already referenced in robots.txt"
+fi
+```
+
+---
+
+## STEP 5: Git Commit
+**Executor**: [Codey] (Lead)
+
+### Commit Changes:
+```bash
+git add "$SITEMAP_PATH"
+git add "$ROBOTS_PATH" 2>/dev/null || true
+
+git commit -m "chore: regenerate sitemap.xml
+
+Updated sitemap with $URL_COUNT URLs
+Generated by [ProcessGenerateSitemap]
+
+Pages added:
+- Blog posts: $(echo "$BLOG_POSTS" | wc -l)
+- Case studies: $(echo "$CASE_STUDIES" | wc -l)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+```
+
+---
+
+## STEP 6: Ping Search Engines (Optional)
+**Executor**: [Bran] (Lead)
+
+### Submit to Search Engines:
+```bash
+# Ping Google
+curl -s "http://www.google.com/ping?sitemap=$PRODUCTION_URL/sitemap.xml"
+echo "Pinged Google"
+
+# Ping Bing
+curl -s "http://www.bing.com/ping?sitemap=$PRODUCTION_URL/sitemap.xml"
+echo "Pinged Bing"
+
+# Note: For better control, use Google Search Console and Bing Webmaster Tools
+```
+
+---
+
+## FINAL REPORT
+
+```
+SITEMAP GENERATION COMPLETE
+============================
+
+Sitemap: [SITEMAP_PATH]
+Total URLs: [URL_COUNT]
+File Size: [SIZE] KB
+
+URL Breakdown:
+- Homepage: 1
+- Static Pages: [count]
+- Blog Posts: [count]
+- Case Studies: [count]
+
+Validation:
+- XML Valid: [Yes/No]
+- No Duplicates: [Yes/No]
+- URLs Accessible: [Yes/No]
+
+robots.txt: [Updated/Already Set]
+
+Search Engines:
+- Google: [Pinged/Skipped]
+- Bing: [Pinged/Skipped]
+
+Live URL: [PRODUCTION_URL]/sitemap.xml
+
+Next Steps:
+- Deploy to production
+- Verify in Google Search Console
+- Monitor indexing over next 48 hours
+```
+
+---
+
+## CONFIGURATION
+
+```json
+{
+  "sitemap": {
+    "output_path": "/public/sitemap.xml",
+    "production_url": "[PRODUCTION_URL]",
+    "content_directories": [
+      "/content/blog",
+      "/content/case-studies"
+    ],
+    "static_pages": [
+      "/",
+      "/about",
+      "/services",
+      "/contact",
+      "/blog"
+    ],
+    "excluded_patterns": [
+      "*/includes/*",
+      "*/admin/*",
+      "*draft*"
+    ],
+    "ping_search_engines": true
+  }
+}
+```
+
+---
+
+## PHP ALTERNATIVE
+
+For PHP-based projects, here's a PHP sitemap generator:
+
+```php
+<?php
+// lib/generate-sitemap.php
+
+$baseUrl = 'https://yoursite.com';
+$contentDir = __DIR__ . '/../content';
+$publicDir = __DIR__ . '/../public';
+
+$urls = [];
+
+// Add static pages
+$staticPages = ['', 'about', 'services', 'contact', 'blog'];
+foreach ($staticPages as $page) {
+    $urls[] = [
+        'loc' => $baseUrl . '/' . $page,
+        'lastmod' => date('Y-m-d'),
+        'changefreq' => $page === '' ? 'weekly' : 'monthly',
+        'priority' => $page === '' ? '1.0' : '0.8'
+    ];
+}
+
+// Add blog posts
+$blogPosts = glob($contentDir . '/blog/*.md');
+foreach ($blogPosts as $post) {
+    $filename = basename($post, '.md');
+    preg_match('/^(\d{4}-\d{2}-\d{2})-(.+)$/', $filename, $matches);
+    $date = $matches[1] ?? date('Y-m-d');
+    $slug = $matches[2] ?? $filename;
+
+    $urls[] = [
+        'loc' => $baseUrl . '/blog/' . $slug,
+        'lastmod' => $date,
+        'changefreq' => 'yearly',
+        'priority' => '0.6'
+    ];
+}
+
+// Generate XML
+$xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
+$xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
+
+foreach ($urls as $url) {
+    $xml .= '  <url>' . PHP_EOL;
+    $xml .= '    <loc>' . htmlspecialchars($url['loc']) . '</loc>' . PHP_EOL;
+    $xml .= '    <lastmod>' . $url['lastmod'] . '</lastmod>' . PHP_EOL;
+    $xml .= '    <changefreq>' . $url['changefreq'] . '</changefreq>' . PHP_EOL;
+    $xml .= '    <priority>' . $url['priority'] . '</priority>' . PHP_EOL;
+    $xml .= '  </url>' . PHP_EOL;
+}
+
+$xml .= '</urlset>';
+
+file_put_contents($publicDir . '/sitemap.xml', $xml);
+echo "Sitemap generated with " . count($urls) . " URLs\n";
+```
+
+---
+
+**Command Status**: SITE-SPECIFIC TEMPLATE
+**Customization Required**: Yes - update paths and URL structure
+**Last Updated**: 2025-01-01
+**Maintainer**: [Bran] (SEO) / [Syntax] (Technical)

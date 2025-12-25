@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sample Project - Dev Kanban Board</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .kanban-column { min-height: 500px; }
+        .kanban-card { transition: all 0.2s ease; }
+        .kanban-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .status-completed { color: #16a34a; }
+        .status-blocked { color: #dc2626; }
+        .status-review { color: #ca8a04; }
+        .priority-high { border-left: 4px solid #dc2626; }
+        .priority-medium { border-left: 4px solid #ca8a04; }
+        .priority-low { border-left: 4px solid #16a34a; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Sample Project - Development Board</h1>
+            <p class="text-gray-600">Sprint 3 (2025-01-06 to 2025-01-17)</p>
+            <p class="text-sm text-gray-500">Sprint Goal: Complete user authentication and blog system</p>
+        </div>
+
+        <!-- Kanban Board -->
+        <div class="grid grid-cols-5 gap-4">
+
+            <!-- Backlog Column -->
+            <div class="bg-purple-50 rounded-lg p-3 kanban-column">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="font-semibold text-purple-800">Backlog</h2>
+                    <span class="bg-purple-200 text-purple-800 text-xs px-2 py-1 rounded-full" id="backlog-count">2</span>
+                </div>
+                <!-- KANBAN_BACKLOG_START -->
+
+                <div class="kanban-card bg-white rounded-lg p-3 mb-2 shadow-sm priority-low" data-id="008" data-type="feature" data-priority="low">
+                    <h4 class="font-medium text-sm text-gray-800">#008 - Add dark mode toggle</h4>
+                    <p class="text-xs text-gray-500 mt-1">Allow users to switch between light and dark themes</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="card-assignee text-xs text-gray-600">[Aesthetica]</span>
+                        <span class="card-status text-xs">Pending</span>
+                    </div>
+                </div>
+
+                <div class="kanban-card bg-white rounded-lg p-3 mb-2 shadow-sm priority-low" data-id="009" data-type="docs" data-priority="low">
+                    <h4 class="font-medium text-sm text-gray-800">#009 - Update API documentation</h4>
+                    <p class="text-xs text-gray-500 mt-1">Document all REST endpoints</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="card-assignee text-xs text-gray-600">[Syntax]</span>
+                        <span class="card-status text-xs">Pending</span>
+                    </div>
+                </div>
+
+                <!-- KANBAN_BACKLOG_END -->
+            </div>
+
+            <!-- Sprint Column -->
+            <div class="bg-blue-50 rounded-lg p-3 kanban-column">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="font-semibold text-blue-800">Sprint</h2>
+                    <span class="bg-blue-200 text-blue-800 text-xs px-2 py-1 rounded-full" id="sprint-count">2</span>
+                </div>
+                <!-- KANBAN_SPRINT_START -->
+
+                <div class="kanban-card bg-white rounded-lg p-3 mb-2 shadow-sm priority-high" data-id="005" data-type="feature" data-priority="high">
+                    <h4 class="font-medium text-sm text-gray-800">#005 - User login page</h4>
+                    <p class="text-xs text-gray-500 mt-1">Create login form with validation</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="card-assignee text-xs text-gray-600">[Aesthetica]</span>
+                        <span class="card-status text-xs">In Progress</span>
+                    </div>
+                </div>
+
+                <div class="kanban-card bg-white rounded-lg p-3 mb-2 shadow-sm priority-medium" data-id="006" data-type="feature" data-priority="medium">
+                    <h4 class="font-medium text-sm text-gray-800">#006 - Blog post creation</h4>
+                    <p class="text-xs text-gray-500 mt-1">Implement markdown editor for new posts</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="card-assignee text-xs text-gray-600">[Syntax]</span>
+                        <span class="card-status text-xs">In Progress</span>
+                    </div>
+                </div>
+
+                <!-- KANBAN_SPRINT_END -->
+            </div>
+
+            <!-- QA Column -->
+            <div class="bg-orange-50 rounded-lg p-3 kanban-column">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="font-semibold text-orange-800">QA</h2>
+                    <span class="bg-orange-200 text-orange-800 text-xs px-2 py-1 rounded-full" id="qa-count">1</span>
+                </div>
+                <!-- KANBAN_QA_START -->
+
+                <div class="kanban-card bg-white rounded-lg p-3 mb-2 shadow-sm priority-high" data-id="004" data-type="feature" data-priority="high">
+                    <h4 class="font-medium text-sm text-gray-800">#004 - User registration</h4>
+                    <p class="text-xs text-gray-500 mt-1">Registration form with email verification</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="card-assignee text-xs text-gray-600">[Verity]</span>
+                        <span class="card-status text-xs status-review">In Review</span>
+                    </div>
+                </div>
+
+                <!-- KANBAN_QA_END -->
+            </div>
+
+            <!-- Staged Column -->
+            <div class="bg-yellow-50 rounded-lg p-3 kanban-column">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="font-semibold text-yellow-800">Staged</h2>
+                    <span class="bg-yellow-200 text-yellow-800 text-xs px-2 py-1 rounded-full" id="staged-count">1</span>
+                </div>
+                <!-- KANBAN_STAGED_START -->
+
+                <div class="kanban-card bg-white rounded-lg p-3 mb-2 shadow-sm priority-medium" data-id="003" data-type="feature" data-priority="medium">
+                    <h4 class="font-medium text-sm text-gray-800">#003 - Homepage redesign</h4>
+                    <p class="text-xs text-gray-500 mt-1">New hero section and testimonials</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="card-assignee text-xs text-gray-600">[Flow]</span>
+                        <span class="card-status text-xs">Ready for Deploy</span>
+                    </div>
+                </div>
+
+                <!-- KANBAN_STAGED_END -->
+            </div>
+
+            <!-- Done Column -->
+            <div class="bg-green-50 rounded-lg p-3 kanban-column">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="font-semibold text-green-800">✅ Done</h2>
+                    <span class="bg-green-200 text-green-800 text-xs px-2 py-1 rounded-full" id="done-count">2</span>
+                </div>
+                <!-- KANBAN_DONE_START -->
+
+                <div class="kanban-card bg-white rounded-lg p-3 mb-2 shadow-sm priority-high" data-id="001" data-type="feature" data-priority="high">
+                    <h4 class="font-medium text-sm text-gray-800">#001 - Project setup</h4>
+                    <p class="text-xs text-gray-500 mt-1">Initial project structure and config</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="card-assignee text-xs text-gray-600">[Syntax]</span>
+                        <span class="card-status text-xs status-completed">COMPLETED</span>
+                    </div>
+                </div>
+
+                <div class="kanban-card bg-white rounded-lg p-3 mb-2 shadow-sm priority-high" data-id="002" data-type="feature" data-priority="high">
+                    <h4 class="font-medium text-sm text-gray-800">#002 - Database schema</h4>
+                    <p class="text-xs text-gray-500 mt-1">User and blog tables created</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="card-assignee text-xs text-gray-600">[Syntax]</span>
+                        <span class="card-status text-xs status-completed">COMPLETED</span>
+                    </div>
+                </div>
+
+                <!-- KANBAN_DONE_END -->
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="mt-6 p-4 bg-white rounded-lg shadow-sm">
+            <h3 class="font-semibold text-gray-700 mb-2">Legend</h3>
+            <div class="flex flex-wrap gap-4 text-sm">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 bg-red-500 rounded"></span>
+                    <span>High Priority</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 bg-yellow-500 rounded"></span>
+                    <span>Medium Priority</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 bg-green-500 rounded"></span>
+                    <span>Low Priority</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
