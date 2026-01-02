@@ -242,7 +242,7 @@ Description, acceptance criteria
 What you're NOT building (important for AI to understand boundaries)
 ```
 
-See `examples/` for complete PRD templates.
+See `examples/` for complete PRD templates or [rapidPRD Library](https://rapidprd.app/library)
 
 ---
 
