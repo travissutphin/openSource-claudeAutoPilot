@@ -95,7 +95,7 @@ Claude breaks your PRD into tasks on the kanban board and guides you through imp
 - [Claude Code](https://claude.ai/code) installed
 - Node.js 18+ (for automation scripts)
 - Git
-- A well-formatted PRD (see `examples/sample-prd-saas.md`)
+- A well-formatted PRD - Learn how to create an AI Dev ready PRD or have AI build it for you here - +[rapidPRD.app](https://rapidprd.app)
 
 ---
 
