@@ -3,6 +3,7 @@
 **Autonomous AI Development Framework for Claude Code**
 
 Turn a PRD into a production app with AI handling the process. You make decisions. AI does everything else.
+Whats a PRD? Learn how to create an AI Dev ready PRD or have AI build it for you here - +[rapidPRD.app](https://rapidprd.app)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Claude Code](https://img.shields.io/badge/Built%20for-Claude%20Code-blueviolet)](https://claude.ai/code)
