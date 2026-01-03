@@ -319,7 +319,7 @@ CASE STUDY VISUALS:
 LAST_ID=$(grep -oP 'data-id="\K\d+' "$KANBAN_FILE" | sort -n | tail -1)
 NEW_ID=$((LAST_ID + 1))
 
-node /docs-framework/automation/kanban-updater.js \
+node /.autopilot/automation/kanban-updater.js \
   --action="add" \
   --column="sprint" \
   --task-id="$NEW_ID" \

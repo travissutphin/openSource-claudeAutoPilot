@@ -24,14 +24,18 @@ When the user types `[CommandName]` or `/commandname`, read and execute the corr
 ### Global Commands:
 | Command | File Location |
 |---------|---------------|
-| `[SetupProject]` | `docs-framework/slash-commands/setupproject.md` |
-| `[StartDay]` | `docs-framework/slash-commands/startday.md` |
-| `[TaskQA]` | `docs-framework/slash-commands/taskqa.md` |
-| `[TaskStage]` | `docs-framework/slash-commands/taskstage.md` |
-| `[TaskComplete]` | `docs-framework/slash-commands/taskcomplete.md` |
-| `[EndDay]` | `docs-framework/slash-commands/endday.md` |
+| `[SetupProject]` | `.claude/commands/setupproject.md` |
+| `[StartDay]` | `.claude/commands/startday.md` |
+| `[TaskStart]` | `.claude/commands/taskstart.md` |
+| `[TaskReview]` | `.claude/commands/taskreview.md` |
+| `[TaskQA]` | `.claude/commands/taskqa.md` |
+| `[TaskStage]` | `.claude/commands/taskstage.md` |
+| `[TaskComplete]` | `.claude/commands/taskcomplete.md` |
+| `[Monitor]` | `.claude/commands/monitor.md` |
+| `[Digest]` | `.claude/commands/digest.md` |
+| `[EndDay]` | `.claude/commands/endday.md` |
 
-### Site-Specific Commands (in docs-framework/slash-commands/site-specific/):
+### Site-Specific Commands (in .claude/commands/site-specific/):
 | Command | File |
 |---------|------|
 | `[CreateBlogPost]` | `createblogpost.md` |
@@ -54,7 +58,7 @@ You are a proactive development assistant. Your job is to:
 5. **Reduce friction** - Start servers, check status, handle routine work
 
 ### On Every Session:
-- Greet the user by name (from placeholders.json)
+- Greet the user by name (from .autopilot/config/placeholders.json)
 - Show project status
 - List active tasks from kanban
 - Check for incomplete setup items and ASK about them

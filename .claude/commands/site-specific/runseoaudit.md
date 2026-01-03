@@ -408,7 +408,7 @@ Ongoing:
 ```bash
 # Create cards for critical issues
 for ISSUE in "${CRITICAL_ISSUES[@]}"; do
-    node /docs-framework/automation/kanban-updater.js \
+    node /.autopilot/automation/kanban-updater.js \
       --action="add" \
       --column="backlog" \
       --title="SEO: $ISSUE" \

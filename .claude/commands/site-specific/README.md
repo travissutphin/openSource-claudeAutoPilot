@@ -17,7 +17,7 @@ These are **template commands** that require customization for each project. Unl
 
 ### 1. Copy to Your Project
 ```bash
-cp docs-framework/slash-commands/site-specific/*.md .claude/commands/
+cp .claude/commands/site-specific/*.md .claude/commands/
 ```
 
 ### 2. Customize Placeholders

@@ -83,7 +83,7 @@ SECURITY PRE-CHECK:
 
 ### Actions to Execute:
 ```bash
-node /docs-framework/automation/kanban-updater.js \
+node /.autopilot/automation/kanban-updater.js \
   --task-id="$TASK_ID" \
   --from-column="qa" \
   --to-column="staging" \
@@ -344,7 +344,7 @@ Action Required:
 **No [PRODUCT_OWNER] approval required for staging**
 **Production deployment requires separate approval**
 
-Reference: `/docs-framework/config/approval-levels.json`
+Reference: `/.autopilot/config/approval-levels.json`
 
 ---
 

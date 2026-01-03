@@ -68,8 +68,8 @@ CURRENT_COLUMN=$(grep -B20 "data-id=\"$TASK_ID\"" "$KANBAN_FILE" | grep -oP "KAN
 - Task ID: #[ID]
 - Title: [Task Title]
 - Assignee: [Team Member]
-- Current Status: [In Progress/Review/QA/Staging]
-- Moving to: Done ✅
+- Current Status: [In Progress/QA]
+- Moving to: Live 🚀
 ```
 
 ---
@@ -80,16 +80,17 @@ CURRENT_COLUMN=$(grep -B20 "data-id=\"$TASK_ID\"" "$KANBAN_FILE" | grep -oP "KAN
 ### Actions to Execute:
 ```bash
 # Run kanban updater script
-node /docs-framework/automation/kanban-updater.js \
+node /.autopilot/automation/kanban-updater.js \
   --task-id="$TASK_ID" \
-  --from-column="staging" \
-  --to-column="done" \
+  --from-column="qa" \
+  --to-column="live" \
+  --sprint="$SPRINT_NUM" \
   --status="completed" \
-  --add-note="✅ COMPLETED: Deployed to production $(date +%Y-%m-%d)"
+  --add-note="🚀 LIVE: Deployed to production $(date +%Y-%m-%d)"
 
 # Check if script succeeded
 if [ $? -eq 0 ]; then
-    echo "✅ Kanban updated: Task #$TASK_ID moved to Done"
+    echo "✅ Kanban updated: Task #$TASK_ID moved to Live"
 else
     echo "❌ Kanban update failed - manual intervention required"
     exit 1
@@ -97,8 +98,8 @@ fi
 ```
 
 ### Expected Changes:
-- Card HTML moved from `<!-- KANBAN_STAGING_START -->` to `<!-- KANBAN_DONE_START -->`
-- Card status updated to `<span class="card-status status-completed">✅ COMPLETED</span>`
+- Card HTML moved from `<!-- KANBAN_QA_START_X -->` to `<!-- KANBAN_LIVE_START_X -->` (X = sprint number)
+- Card status updated to `<span class="card-status status-completed">🚀 LIVE</span>`
 - Card description updated with completion note
 - Column counts automatically recalculated by kanban JavaScript
 
@@ -148,8 +149,8 @@ if [[ "$TASK_TITLE" == *"doc"* ]] || [[ "$TASK_TITLE" == *"guide"* ]]; then
     echo "📚 Documentation task detected - syncing docs"
 
     # Run docs sync script if exists
-    if [ -f "./automation/sync-docs.sh" ]; then
-        ./automation/sync-docs.sh
+    if [ -f "./.autopilot/automation/sync-docs.sh" ]; then
+        ./.autopilot/automation/sync-docs.sh
         echo "✅ Documentation synced"
     fi
 fi
@@ -243,8 +244,8 @@ echo "3. Start next task: [StartDay] to see kanban priorities"
 📊 ACTIONS PERFORMED:
 
 ✅ Kanban Updated:
-   - Card moved from Staging → Done
-   - Status set to "Completed"
+   - Card moved from QA → Live
+   - Status set to "Live"
    - Completion note added
 
 ✅ Git Commit:
@@ -309,8 +310,8 @@ Then I'll complete the workflow.
 
 **Action Required:**
 1. Verify task #[ID] exists in kanban_dev.html
-2. Check: /docs-framework/automation/kanban-updater.js exists
-3. Run manually: node automation/kanban-updater.js --help
+2. Check: /.autopilot/automation/kanban-updater.js exists
+3. Run manually: node .autopilot/automation/kanban-updater.js --help
 ```
 
 ### If git commit fails:
@@ -335,14 +336,14 @@ git commit -m "chore: complete task #[ID]"
 
 **Exception**: If task involves production deployment, [Flow] approval may be required based on project settings.
 
-Reference: `/docs-framework/config/approval-levels.json`
+Reference: `/.autopilot/config/approval-levels.json`
 
 ---
 
 ## CONFIGURATION
 
 ### Customize for your project:
-Edit `/docs-framework/config/placeholders.json`:
+Edit `/.autopilot/config/placeholders.json`:
 ```json
 {
   "paths": {
@@ -379,12 +380,13 @@ Edit task type keywords in script:
 ## MAINTENANCE
 
 ### Update workflow:
-1. Edit this file or `/docs-framework/automation/process-taskcomplete.sh`
+1. Edit this file or `/.autopilot/automation/process-taskcomplete.sh`
 2. Test on development branch first
 3. Verify kanban updates correctly
 4. Deploy to production workflow
 
 ### Version history:
+- v3.0.0 (2026-01-03): Updated for 4-column workflow (QA → Live), sprint support
 - v2.0.0 (2025-12-22): Updated for 7-column workflow (Staging → Done)
 - v1.0.0 (2025-10-12): Initial release
 

@@ -185,7 +185,7 @@ auto_progress_task() {
     TO_COLUMN=$3
 
     # Update kanban
-    node automation/kanban-updater.js \
+    node .autopilot/automation/kanban-updater.js \
         --task-id="$TASK_ID" \
         --from-column="$FROM_COLUMN" \
         --to-column="$TO_COLUMN" \
@@ -214,7 +214,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 ### Check for Responses:
 ```bash
 # Parse pending.md for checked responses
-PENDING_FILE="docs/decisions/pending.md"
+PENDING_FILE=".autopilot/docs/decisions/pending.md"
 
 # Find decisions with checked options
 RESPONDED=$(grep -B10 '\[x\]' "$PENDING_FILE" | grep '### #')

@@ -44,11 +44,11 @@ temp/
 *.sqlite3
 
 # Decision archive (project-specific)
-docs/decisions/archive/*.md
+.autopilot/docs/decisions/archive/*.md
 
 # Generated files that are project-specific
 docs/kanban/kanban_dev.html
+CLAUDE.md
 
 # Keep example files
 !.env.example
-!examples/

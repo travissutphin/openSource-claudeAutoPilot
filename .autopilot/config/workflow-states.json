@@ -1,0 +1,112 @@
+{
+  "_comment": "Kanban workflow states configuration - 4-column simplified workflow",
+  "_version": "3.0.0",
+
+  "workflow_name": "Simplified DevOps Kanban",
+
+  "columns": [
+    {
+      "id": "backlog",
+      "name": "Backlog",
+      "icon": "📋",
+      "description": "Queued to complete - prioritized work not yet started",
+      "color": "#ddd6fe",
+      "next_states": ["in_progress"]
+    },
+    {
+      "id": "in_progress",
+      "name": "In Progress",
+      "icon": "🔨",
+      "description": "AI team actively working on this task",
+      "color": "#bfdbfe",
+      "next_states": ["qa", "backlog"]
+    },
+    {
+      "id": "qa",
+      "name": "QA",
+      "icon": "🧪",
+      "description": "Ready for AI + Human QA testing",
+      "color": "#fed7aa",
+      "next_states": ["live", "in_progress"]
+    },
+    {
+      "id": "live",
+      "name": "Live",
+      "icon": "🚀",
+      "description": "Pushed to production - Task completed",
+      "color": "#bbf7d0",
+      "next_states": []
+    }
+  ],
+
+  "automation_triggers": {
+    "_comment": "Define when automation should move cards between states",
+    "on_task_start": {
+      "enabled": true,
+      "action": "move_to_in_progress"
+    },
+    "on_qa_ready": {
+      "enabled": true,
+      "action": "move_to_qa"
+    },
+    "on_task_complete": {
+      "enabled": true,
+      "action": "move_to_live"
+    }
+  },
+
+  "card_properties": {
+    "task_types": [
+      {"id": "feature", "name": "Feature", "color": "#dbeafe"},
+      {"id": "bug", "name": "Bug", "color": "#fee2e2"},
+      {"id": "hotfix", "name": "Hotfix", "color": "#fef3c7"},
+      {"id": "refactor", "name": "Refactor", "color": "#e9d5ff"},
+      {"id": "test", "name": "Test", "color": "#d1fae5"},
+      {"id": "docs", "name": "Docs", "color": "#fed7e2"},
+      {"id": "chore", "name": "Chore", "color": "#e5e7eb"}
+    ],
+    "priorities": [
+      {"id": "high", "name": "High", "icon": "🔴"},
+      {"id": "medium", "name": "Medium", "icon": "🟡"},
+      {"id": "low", "name": "Low", "icon": "🟢"}
+    ],
+    "statuses": [
+      {"id": "completed", "name": "Completed", "icon": "✅"},
+      {"id": "blocked", "name": "Blocked", "icon": "🚫"},
+      {"id": "waiting", "name": "Waiting", "icon": "⏳"}
+    ]
+  },
+
+  "html_markers": {
+    "_comment": "HTML comment markers used by kanban-updater.js to locate columns. Suffix with sprint number (e.g., _1, _2)",
+    "backlog": {
+      "start": "<!-- KANBAN_BACKLOG_START",
+      "end": "<!-- KANBAN_BACKLOG_END"
+    },
+    "in_progress": {
+      "start": "<!-- KANBAN_IN_PROGRESS_START",
+      "end": "<!-- KANBAN_IN_PROGRESS_END"
+    },
+    "qa": {
+      "start": "<!-- KANBAN_QA_START",
+      "end": "<!-- KANBAN_QA_END"
+    },
+    "live": {
+      "start": "<!-- KANBAN_LIVE_START",
+      "end": "<!-- KANBAN_LIVE_END"
+    }
+  },
+
+  "sprint_config": {
+    "_comment": "Sprint/milestone configuration for multi-board setup",
+    "enabled": true,
+    "tab_markers": {
+      "start": "<!-- SPRINT_TABS_START -->",
+      "end": "<!-- SPRINT_TABS_END -->"
+    },
+    "board_markers": {
+      "start": "<!-- SPRINT_BOARDS_START -->",
+      "end": "<!-- SPRINT_BOARDS_END -->"
+    }
+  }
+}

@@ -233,7 +233,7 @@ CARD_HTML="<div class=\"kanban-card bg-white rounded-lg p-3 mb-2 shadow-sm prior
 </div>"
 
 # Add to Sprint column using kanban-updater or manual insert
-node /docs-framework/automation/kanban-updater.js \
+node /.autopilot/automation/kanban-updater.js \
   --action="add" \
   --column="sprint" \
   --card-html="$CARD_HTML"

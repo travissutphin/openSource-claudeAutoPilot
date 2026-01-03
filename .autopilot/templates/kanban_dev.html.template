@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[PROJECT_NAME] - Development Board</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --color-backlog: #8b5cf6;
+            --color-backlog-light: #ede9fe;
+            --color-progress: #3b82f6;
+            --color-progress-light: #dbeafe;
+            --color-qa: #f59e0b;
+            --color-qa-light: #fef3c7;
+            --color-live: #10b981;
+            --color-live-light: #d1fae5;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        .kanban-column {
+            min-height: 500px;
+        }
+
+        .kanban-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .kanban-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .kanban-card.expanded .card-details {
+            display: block;
+        }
+
+        .kanban-card .card-details {
+            display: none;
+        }
+
+        .priority-high {
+            border-left: 3px solid #ef4444;
+        }
+
+        .priority-medium {
+            border-left: 3px solid #f59e0b;
+        }
+
+        .priority-low {
+            border-left: 3px solid #10b981;
+        }
+
+        .sprint-tab {
+            transition: all 0.2s ease;
+        }
+
+        .sprint-tab:hover:not(.sprint-tab-active) {
+            background-color: #f3f4f6;
+        }
+
+        .sprint-tab-active {
+            background-color: #1f2937;
+            color: white;
+        }
+
+        .sprint-tab-complete {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .column-tab {
+            transition: all 0.15s ease;
+        }
+
+        .column-tab:hover {
+            background-color: #f9fafb;
+        }
+
+        .column-tab-active {
+            background-color: #f3f4f6;
+            font-weight: 600;
+        }
+
+        .column-hidden {
+            display: none;
+        }
+
+        .sprint-hidden {
+            display: none;
+        }
+
+        .acceptance-item {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .acceptance-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.25rem;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #d1d5db;
+            border-radius: 0.25rem;
+        }
+
+        .acceptance-item.done::before {
+            background-color: #10b981;
+            border-color: #10b981;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+            background-size: 10px;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-[1600px] mx-auto px-6 py-8">
+
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">[PROJECT_NAME]</h1>
+                    <p class="text-gray-500 mt-1">Development Board</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-sm text-gray-500">Last updated: <span id="last-updated">--</span></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sprint Navigation -->
+        <nav class="mb-6">
+            <div class="flex items-center gap-2 flex-wrap">
+                <!-- SPRINT_TABS_START -->
+                <button onclick="showSprint(1)" class="sprint-tab sprint-tab-active flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium" data-sprint="1">
+                    <i data-lucide="layers" class="w-4 h-4"></i>
+                    Sprint 1
+                    <span class="text-xs opacity-75">(Active)</span>
+                </button>
+                <!-- SPRINT_TABS_END -->
+            </div>
+        </nav>
+
+        <!-- ==================== SPRINT 1 BOARD ==================== -->
+        <!-- SPRINT_BOARDS_START -->
+        <div id="sprint-1" class="sprint-board">
+
+            <!-- Sprint Header -->
+            <div class="bg-white border border-gray-200 rounded-xl p-5 mb-6">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <i data-lucide="target" class="w-5 h-5 text-gray-400"></i>
+                            <h2 class="font-semibold text-gray-900">Sprint 1: [SPRINT_1_NAME]</h2>
+                        </div>
+                        <p class="text-gray-600 text-sm ml-7">[SPRINT_1_GOAL]</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="badge bg-blue-100 text-blue-700">
+                            <i data-lucide="activity" class="w-3 h-3"></i>
+                            In Progress
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column Filter -->
+            <div class="flex items-center gap-1 mb-6 bg-white border border-gray-200 rounded-lg p-1 w-fit">
+                <button onclick="showAll(1)" class="column-tab column-tab-active flex items-center gap-2 px-3 py-1.5 rounded-md text-sm" data-tab="all" data-sprint="1">
+                    All
+                </button>
+                <button onclick="showPhase('backlog', 1)" class="column-tab flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-gray-600" data-tab="backlog" data-sprint="1">
+                    <span class="w-2 h-2 rounded-full bg-violet-500"></span>
+                    Backlog
+                    <span class="text-xs text-gray-400" id="tab-backlog-count-1">0</span>
+                </button>
+                <button onclick="showPhase('in_progress', 1)" class="column-tab flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-gray-600" data-tab="in_progress" data-sprint="1">
+                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                    In Progress
+                    <span class="text-xs text-gray-400" id="tab-in_progress-count-1">0</span>
+                </button>
+                <button onclick="showPhase('qa', 1)" class="column-tab flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-gray-600" data-tab="qa" data-sprint="1">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    QA
+                    <span class="text-xs text-gray-400" id="tab-qa-count-1">0</span>
+                </button>
+                <button onclick="showPhase('live', 1)" class="column-tab flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-gray-600" data-tab="live" data-sprint="1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    Live
+                    <span class="text-xs text-gray-400" id="tab-live-count-1">0</span>
+                </button>
+            </div>
+
+            <!-- Kanban Board -->
+            <div class="grid grid-cols-4 gap-4" id="kanban-board-1">
+
+                <!-- Backlog Column -->
+                <div class="kanban-column" id="col-backlog-1" data-column="backlog">
+                    <div class="bg-violet-50 border border-violet-100 rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center">
+                                    <i data-lucide="inbox" class="w-4 h-4 text-violet-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 text-sm">Backlog</h3>
+                                    <p class="text-xs text-gray-500">Queued</p>
+                                </div>
+                            </div>
+                            <span class="text-sm font-medium text-violet-600" id="backlog-count-1">0</span>
+                        </div>
+                        <div class="space-y-3" id="backlog-cards-1">
+                            <!-- KANBAN_BACKLOG_START_1 -->
+
+                            <!-- KANBAN_BACKLOG_END_1 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- In Progress Column -->
+                <div class="kanban-column" id="col-in_progress-1" data-column="in_progress">
+                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center">
+                                    <i data-lucide="loader" class="w-4 h-4 text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 text-sm">In Progress</h3>
+                                    <p class="text-xs text-gray-500">Active work</p>
+                                </div>
+                            </div>
+                            <span class="text-sm font-medium text-blue-600" id="in_progress-count-1">0</span>
+                        </div>
+                        <div class="space-y-3" id="in_progress-cards-1">
+                            <!-- KANBAN_IN_PROGRESS_START_1 -->
+
+                            <!-- KANBAN_IN_PROGRESS_END_1 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QA Column -->
+                <div class="kanban-column" id="col-qa-1" data-column="qa">
+                    <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                                    <i data-lucide="search-check" class="w-4 h-4 text-amber-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 text-sm">QA</h3>
+                                    <p class="text-xs text-gray-500">Testing</p>
+                                </div>
+                            </div>
+                            <span class="text-sm font-medium text-amber-600" id="qa-count-1">0</span>
+                        </div>
+                        <div class="space-y-3" id="qa-cards-1">
+                            <!-- KANBAN_QA_START_1 -->
+
+                            <!-- KANBAN_QA_END_1 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Column -->
+                <div class="kanban-column" id="col-live-1" data-column="live">
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                                    <i data-lucide="rocket" class="w-4 h-4 text-emerald-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold text-gray-900 text-sm">Live</h3>
+                                    <p class="text-xs text-gray-500">Production</p>
+                                </div>
+                            </div>
+                            <span class="text-sm font-medium text-emerald-600" id="live-count-1">0</span>
+                        </div>
+                        <div class="space-y-3" id="live-cards-1">
+                            <!-- KANBAN_LIVE_START_1 -->
+
+                            <!-- KANBAN_LIVE_END_1 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- SPRINT_BOARDS_END -->
+
+        <!-- Workflow Reference -->
+        <div class="mt-10 bg-white border border-gray-200 rounded-xl p-6">
+            <h3 class="font-semibold text-gray-900 mb-4">Workflow</h3>
+            <div class="flex items-center justify-center gap-3">
+                <div class="flex items-center gap-2 px-4 py-2 bg-violet-50 rounded-lg">
+                    <i data-lucide="inbox" class="w-4 h-4 text-violet-600"></i>
+                    <span class="text-sm font-medium text-violet-700">Backlog</span>
+                </div>
+                <i data-lucide="arrow-right" class="w-4 h-4 text-gray-300"></i>
+                <div class="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-lg">
+                    <i data-lucide="loader" class="w-4 h-4 text-blue-600"></i>
+                    <span class="text-sm font-medium text-blue-700">In Progress</span>
+                </div>
+                <i data-lucide="arrow-right" class="w-4 h-4 text-gray-300"></i>
+                <div class="flex items-center gap-2 px-4 py-2 bg-amber-50 rounded-lg">
+                    <i data-lucide="search-check" class="w-4 h-4 text-amber-600"></i>
+                    <span class="text-sm font-medium text-amber-700">QA</span>
+                </div>
+                <i data-lucide="arrow-right" class="w-4 h-4 text-gray-300"></i>
+                <div class="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-lg">
+                    <i data-lucide="rocket" class="w-4 h-4 text-emerald-600"></i>
+                    <span class="text-sm font-medium text-emerald-700">Live</span>
+                </div>
+            </div>
+            <div class="mt-4 grid grid-cols-4 gap-3 text-center text-xs text-gray-400">
+                <div>Queued tasks</div>
+                <div>[TaskStart]</div>
+                <div>[TaskQA]</div>
+                <div>[TaskComplete]</div>
+            </div>
+        </div>
+
+        <!-- Card Template Reference -->
+        <details class="mt-6 bg-white border border-gray-200 rounded-xl">
+            <summary class="px-6 py-4 cursor-pointer font-semibold text-gray-900 flex items-center gap-2">
+                <i data-lucide="code-2" class="w-4 h-4 text-gray-400"></i>
+                Card Template Reference
+            </summary>
+            <div class="px-6 pb-6">
+                <pre class="bg-gray-900 text-gray-100 p-4 rounded-lg text-xs overflow-x-auto"><code>&lt;div class="kanban-card bg-white rounded-lg p-4 shadow-sm border border-gray-100 priority-medium"
+     data-id="XXX"
+     data-type="feature"
+     data-priority="medium"
+     data-sprint="1"
+     data-created="YYYY-MM-DD"
+     data-assignee="[TeamMember]"
+     onclick="toggleCard(this)"&gt;
+    &lt;div class="flex items-start justify-between mb-2"&gt;
+        &lt;span class="text-xs text-gray-400"&gt;#XXX&lt;/span&gt;
+        &lt;span class="badge bg-blue-100 text-blue-700"&gt;feature&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;h4 class="font-medium text-gray-900 text-sm mb-2"&gt;Task Title&lt;/h4&gt;
+    &lt;p class="text-xs text-gray-500 mb-3"&gt;Brief description&lt;/p&gt;
+    &lt;div class="flex items-center justify-between text-xs"&gt;
+        &lt;span class="text-gray-500"&gt;[Assignee]&lt;/span&gt;
+        &lt;span class="text-gray-400"&gt;2 days ago&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class="card-details mt-4 pt-4 border-t border-gray-100"&gt;
+        &lt;h5 class="text-xs font-semibold text-gray-700 mb-2"&gt;Acceptance Criteria&lt;/h5&gt;
+        &lt;ul class="text-xs text-gray-600 space-y-2"&gt;
+            &lt;li class="acceptance-item"&gt;Criteria 1&lt;/li&gt;
+            &lt;li class="acceptance-item done"&gt;Criteria 2 (completed)&lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+&lt;/div&gt;</code></pre>
+            </div>
+        </details>
+
+        <!-- Legend -->
+        <div class="mt-6 bg-white border border-gray-200 rounded-xl p-6">
+            <h3 class="font-semibold text-gray-900 mb-4">Legend</h3>
+            <div class="flex flex-wrap gap-6">
+                <div>
+                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-2">Priority</p>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-sm bg-red-500"></span>
+                            <span class="text-sm text-gray-600">High</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-sm bg-amber-500"></span>
+                            <span class="text-sm text-gray-600">Medium</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-sm bg-emerald-500"></span>
+                            <span class="text-sm text-gray-600">Low</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-2">Type</p>
+                    <div class="flex items-center gap-3">
+                        <span class="badge bg-blue-100 text-blue-700">feature</span>
+                        <span class="badge bg-red-100 text-red-700">bug</span>
+                        <span class="badge bg-gray-100 text-gray-700">chore</span>
+                        <span class="badge bg-purple-100 text-purple-700">refactor</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Toggle card expansion
+        function toggleCard(card) {
+            card.classList.toggle('expanded');
+        }
+
+        // Show sprint board
+        function showSprint(sprintNum) {
+            document.querySelectorAll('.sprint-board').forEach(board => {
+                board.classList.add('sprint-hidden');
+            });
+            const targetBoard = document.getElementById(`sprint-${sprintNum}`);
+            if (targetBoard) {
+                targetBoard.classList.remove('sprint-hidden');
+            }
+
+            document.querySelectorAll('.sprint-tab').forEach(tab => {
+                tab.classList.remove('sprint-tab-active');
+                if (parseInt(tab.dataset.sprint) === sprintNum) {
+                    tab.classList.add('sprint-tab-active');
+                }
+            });
+
+            lucide.createIcons();
+        }
+
+        // Show all columns for a sprint
+        function showAll(sprintNum) {
+            const board = document.getElementById(`kanban-board-${sprintNum}`);
+            if (board) {
+                board.querySelectorAll('.kanban-column').forEach(col => {
+                    col.classList.remove('column-hidden');
+                });
+                board.className = 'grid grid-cols-4 gap-4';
+            }
+            updateColumnTabs('all', sprintNum);
+        }
+
+        // Show single phase (column) for a sprint
+        function showPhase(phase, sprintNum) {
+            const board = document.getElementById(`kanban-board-${sprintNum}`);
+            if (board) {
+                board.querySelectorAll('.kanban-column').forEach(col => {
+                    if (col.dataset.column === phase) {
+                        col.classList.remove('column-hidden');
+                    } else {
+                        col.classList.add('column-hidden');
+                    }
+                });
+                board.className = 'grid grid-cols-1 gap-4 max-w-xl';
+            }
+            updateColumnTabs(phase, sprintNum);
+        }
+
+        // Update column tab styling
+        function updateColumnTabs(activeTab, sprintNum) {
+            document.querySelectorAll(`.column-tab[data-sprint="${sprintNum}"]`).forEach(btn => {
+                if (btn.dataset.tab === activeTab) {
+                    btn.classList.add('column-tab-active');
+                } else {
+                    btn.classList.remove('column-tab-active');
+                }
+            });
+        }
+
+        // Update column counts for all sprints
+        function updateCounts() {
+            document.querySelectorAll('.sprint-board').forEach(board => {
+                const sprintNum = board.id.replace('sprint-', '');
+                const columns = ['backlog', 'in_progress', 'qa', 'live'];
+                columns.forEach(col => {
+                    const cardsContainer = document.getElementById(`${col}-cards-${sprintNum}`);
+                    if (cardsContainer) {
+                        const count = cardsContainer.querySelectorAll('.kanban-card').length;
+                        const counter = document.getElementById(`${col}-count-${sprintNum}`);
+                        const tabCounter = document.getElementById(`tab-${col}-count-${sprintNum}`);
+                        if (counter) counter.textContent = count;
+                        if (tabCounter) tabCounter.textContent = count;
+                    }
+                });
+            });
+        }
+
+        // Update timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            const options = { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            document.getElementById('last-updated').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCounts();
+            updateTimestamp();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

@@ -19,7 +19,7 @@ Be proactive. Don't just report - ASK questions and TAKE actions.
 **Executor**: [Codey]
 
 ### Actions:
-1. Read `docs-framework/config/placeholders.json`
+1. Read `.autopilot/config/placeholders.json`
 2. Get product_owner name, project name, tech stack
 3. Greet user personally
 
@@ -33,39 +33,132 @@ Tech: [primary_language] + [css_framework]
 
 ---
 
-## STEP 2: Check Active Tasks
+## STEP 2: Check Required Services
+**Executor**: [Flow]
+
+### Purpose:
+Check if required local services are running. If not, ASK user to start them.
+
+### 2.1 Check Database Services:
+```bash
+# PostgreSQL (default port 5432)
+if netstat -ano | grep ":5432" > /dev/null 2>&1; then
+    echo "PostgreSQL: Running ✅"
+else
+    # Check if Docker is being used for PostgreSQL
+    if docker ps 2>/dev/null | grep -q postgres; then
+        echo "PostgreSQL (Docker): Running ✅"
+    else
+        ASK: "PostgreSQL is not running. Please start it:
+              - Docker: docker-compose up -d postgres
+              - Local: Start PostgreSQL service
+              - XAMPP: Start from XAMPP Control Panel
+
+              Let me know when it's running (yes/skip)"
+    fi
+fi
+
+# MySQL/MariaDB (default port 3306)
+if netstat -ano | grep ":3306" > /dev/null 2>&1; then
+    echo "MySQL/MariaDB: Running ✅"
+else
+    ASK: "MySQL/MariaDB is not running. Please start it:
+          - XAMPP: Start MySQL from Control Panel
+          - Docker: docker-compose up -d mysql
+          - Local: Start MySQL service
+
+          Let me know when it's running (yes/skip)"
+fi
+
+# MongoDB (default port 27017)
+if netstat -ano | grep ":27017" > /dev/null 2>&1; then
+    echo "MongoDB: Running ✅"
+fi
+
+# Redis (default port 6379)
+if netstat -ano | grep ":6379" > /dev/null 2>&1; then
+    echo "Redis: Running ✅"
+fi
+```
+
+### 2.2 Check Docker (if docker-compose.yml exists):
+```bash
+if [ -f "docker-compose.yml" ] || [ -f "docker-compose.yaml" ]; then
+    # Check if Docker daemon is running
+    if ! docker info > /dev/null 2>&1; then
+        ASK: "Docker is required but not running. Please start Docker Desktop.
+              Let me know when it's running (yes/skip)"
+    else
+        # Check if containers are up
+        RUNNING=$(docker-compose ps --filter "status=running" -q 2>/dev/null | wc -l)
+        TOTAL=$(docker-compose ps -q 2>/dev/null | wc -l)
+
+        if [ "$RUNNING" -lt "$TOTAL" ]; then
+            ASK: "Docker containers are not all running ($RUNNING/$TOTAL).
+                  Should I run 'docker-compose up -d'? (yes/no)"
+            IF yes: docker-compose up -d
+        fi
+    fi
+fi
+```
+
+### 2.3 Check XAMPP/Apache (for PHP projects):
+```bash
+# Check if Apache is needed (PHP project)
+if [ -f "composer.json" ] || [ -d "public" ] && ls public/*.php 1>/dev/null 2>&1; then
+    if ! netstat -ano | grep ":80\|:443" > /dev/null 2>&1; then
+        ASK: "Apache/web server is not running. Please:
+              - XAMPP: Start Apache from Control Panel
+              - Or I can use PHP built-in server: php -S localhost:8080 -t public
+
+              Which option? (xampp/php/skip)"
+        IF php: php -S localhost:8080 -t public &
+    fi
+fi
+```
+
+### Output:
+```
+SERVICES STATUS:
+----------------
+[✅/⚠️] Database: [status]
+[✅/⚠️] Docker: [status if applicable]
+[✅/⚠️] Web Server: [status]
+```
+
+---
+
+## STEP 3: Check Active Tasks
 **Executor**: [Codey]
 
 ### Actions:
 1. Read kanban board file (from placeholders.json paths.kanban_dev)
-2. Find tasks in "Ready" column (prioritized for work)
-3. Find tasks in "In Progress" column (actively being worked on)
-4. Find tasks in "Review" column (awaiting code review)
-5. Find tasks in "QA" column (testing)
-6. Find tasks in "Staging" column (ready for deploy)
+2. Find tasks in "Backlog" column (queued to complete)
+3. Find tasks in "In Progress" column (AI team actively working)
+4. Find tasks in "QA" column (ready for QA)
+5. Find tasks in "Live" column (pushed to production)
 
 ### Output:
 ```
 CURRENT TASKS:
 --------------
-🎯 Ready: [list or "None"]
+📋 Backlog: [count] tasks queued
 🔨 In Progress: #[ID] - [Title]
-👀 In Review: [list or "None"]
-🧪 In QA: [list or "None"]
-📦 Staging: [list or "None"]
+🧪 QA: [list or "None"]
+🚀 Live: [recent deployments]
 
-[If no active tasks]: No tasks in progress. Ready to pull from Ready column?
+[If no active tasks]: No tasks in progress. Ready to pull from Backlog?
 ```
 
 ---
 
-## STEP 3: Setup Status Check & Interactive Questions
+## STEP 4: Setup Status Check & Interactive Questions
 **Executor**: [Codey], [Flow]
 
 ### Purpose:
 Check for incomplete setup items. For each missing item, ASK the user if they can provide the value NOW.
 
-### 3.1 Check Project Basics:
+### 4.1 Check Project Basics:
 ```
 Read placeholders.json and check:
 
@@ -77,7 +170,7 @@ IF project.repository is empty or placeholder:
    → Ask: "What's the GitHub repository URL for this project?"
 ```
 
-### 3.2 Check Git Repository:
+### 4.2 Check Git Repository:
 ```bash
 # Check git status
 if [ ! -d ".git" ]; then
@@ -92,7 +185,7 @@ if [ -z "$REMOTE" ]; then
 fi
 ```
 
-### 3.3 Check Environment Variables:
+### 4.3 Check Environment Variables:
 ```
 IF .env.example exists but .env doesn't:
    → Run: cp .env.example .env
@@ -118,7 +211,7 @@ IF .env exists:
          IF user says "skip" or "later": Note it and move on
 ```
 
-### 3.4 Check Dependencies:
+### 4.4 Check Dependencies:
 ```bash
 IF package.json exists AND node_modules doesn't:
    ASK: "Dependencies aren't installed. Should I run 'npm install' now?"
@@ -129,7 +222,7 @@ IF composer.json exists AND vendor doesn't:
    IF yes: composer install
 ```
 
-### 3.5 Check Database:
+### 4.5 Check Database:
 ```bash
 IF setup_tasks.database.required == true:
    IF prisma/migrations is empty or doesn't exist:
@@ -150,7 +243,7 @@ SETUP REMINDERS:
 
 ---
 
-## STEP 4: Start Local Development Server
+## STEP 5: Start Local Development Server
 **Executor**: [Flow]
 
 ### Actions:
@@ -189,7 +282,7 @@ LOCAL SERVER:
 
 ---
 
-## STEP 5: Summary & Next Steps
+## STEP 6: Summary & Next Steps
 **Executor**: [Codey]
 
 ### Final Output:
@@ -243,7 +336,7 @@ When asking setup questions, handle responses like:
 
 ## CONFIGURATION
 
-This workflow reads from `docs-framework/config/placeholders.json`:
+This workflow reads from `.autopilot/config/placeholders.json`:
 
 ```json
 {

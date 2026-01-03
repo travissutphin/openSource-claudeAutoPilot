@@ -319,7 +319,7 @@ Check: Verify path in placeholders.json
 **Category**: `auto_execute` (routine operational task)
 **No [PRODUCT_OWNER] approval required**
 
-Reference: `/docs-framework/config/approval-levels.json`
+Reference: `/.autopilot/config/approval-levels.json`
 
 ---
 

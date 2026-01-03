@@ -255,7 +255,7 @@ STAGED_TASKS=$(grep -oP 'data-id="\K\d+' <(sed -n '/KANBAN_STAGED_START/,/KANBAN
 
 # Move each to Done
 for TASK_ID in $STAGED_TASKS; do
-    node /docs-framework/automation/kanban-updater.js \
+    node /.autopilot/automation/kanban-updater.js \
       --task-id="$TASK_ID" \
       --from-column="staged" \
       --to-column="done" \
