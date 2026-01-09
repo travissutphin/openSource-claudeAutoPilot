@@ -11,7 +11,7 @@
 By the end of this guide, your project will have:
 - Automated morning standup via `[StartDay]` command
 - Automated task workflow via `[TaskStart]`, `[TaskReview]`, `[TaskQA]`, `[TaskStage]`, `[TaskComplete]` commands
-- 7-column kanban workflow: Backlog → Ready → In Progress → Review → QA → Staging → Done
+- 5-column kanban workflow: Backlog → Sprint → QA → Staged → Done
 - Self-updating kanban board
 - Zero manual tracking required
 
@@ -143,25 +143,19 @@ Open: `/docs-framework/config/placeholders.json`
 <!-- KANBAN_IN_PROGRESS_END -->
 ```
 
-2. If markers don't exist, add them to each column (7-column workflow):
+2. If markers don't exist, add them to each column (5-column workflow):
 ```html
 <!-- KANBAN_BACKLOG_START -->
 <!-- KANBAN_BACKLOG_END -->
 
-<!-- KANBAN_READY_START -->
-<!-- KANBAN_READY_END -->
-
-<!-- KANBAN_IN_PROGRESS_START -->
-<!-- KANBAN_IN_PROGRESS_END -->
-
-<!-- KANBAN_REVIEW_START -->
-<!-- KANBAN_REVIEW_END -->
+<!-- KANBAN_SPRINT_START -->
+<!-- KANBAN_SPRINT_END -->
 
 <!-- KANBAN_QA_START -->
 <!-- KANBAN_QA_END -->
 
-<!-- KANBAN_STAGING_START -->
-<!-- KANBAN_STAGING_END -->
+<!-- KANBAN_STAGED_START -->
+<!-- KANBAN_STAGED_END -->
 
 <!-- KANBAN_DONE_START -->
 <!-- KANBAN_DONE_END -->

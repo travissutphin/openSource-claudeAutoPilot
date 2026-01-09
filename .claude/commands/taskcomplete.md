@@ -386,14 +386,15 @@ Edit task type keywords in script:
 4. Deploy to production workflow
 
 ### Version history:
+- v4.0.0 (2026-01-08): Updated for 5-column workflow (Staged → Done)
 - v3.0.0 (2026-01-03): Updated for 4-column workflow (QA → Live), sprint support
 - v2.0.0 (2025-12-22): Updated for 7-column workflow (Staging → Done)
 - v1.0.0 (2025-10-12): Initial release
 
 ---
 
-**Command Status**: ✅ PRODUCTION READY
-**Last Updated**: 2025-10-12
+**Command Status**: PRODUCTION READY
+**Last Updated**: 2026-01-08
 **Maintainer**: [Codey] (TPM)
 
 ---

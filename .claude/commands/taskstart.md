@@ -187,11 +187,12 @@ git rebase origin/main
 
 ## VERSION HISTORY
 
+- v3.0.0 (2026-01-08): Updated for 5-column workflow (Backlog → Sprint)
 - v2.0.0 (2025-12-22): Updated for 7-column workflow (Ready → In Progress)
 - v1.0.0 (2025-12-22): Initial release
 
 ---
 
 **Command Status**: PRODUCTION READY
-**Last Updated**: 2025-12-22
+**Last Updated**: 2026-01-08
 **Maintainer**: [Codey] (TPM)

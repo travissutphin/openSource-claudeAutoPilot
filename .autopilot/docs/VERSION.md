@@ -14,7 +14,7 @@
 
 **Major Changes:**
 - Renamed to Claude AutoPilot for open source release
-- Full autonomous DevOps workflow with 7 kanban stages
+- Full autonomous DevOps workflow with 5 kanban stages
 - Decision-only notification system (AI handles 90% automatically)
 - Quality gates for automated stage transitions
 - Environment management (Local/Staging/Production)
@@ -46,16 +46,14 @@
 
 ---
 
-### v1.1.0 (2025-12-23) - 7-Column DevOps Workflow
+### v1.1.0 (2025-12-23) - 5-Column DevOps Workflow
 
 **Major Changes:**
-- Updated to industry-standard 7-column kanban workflow
-- New workflow: `Backlog → Ready → In Progress → Review → QA → Staging → Done`
-- Added 24-hour staging soak test before production
+- Updated to streamlined 5-column kanban workflow
+- Workflow: `Backlog → Sprint → QA → Staged → Done`
 - Added automated security scanning
 
 **Breaking Changes:**
-- Column IDs changed: `sprint` → `in_progress`, `staged` → `staging`
 - New HTML markers required for kanban automation
 
 ---
@@ -76,7 +74,7 @@
 | Version | Date | Highlights |
 |---------|------|------------|
 | 2.0.0 | 2025-12-25 | Open source release, autonomous operations |
-| 1.1.0 | 2025-12-23 | 7-column workflow, staging soak test |
+| 1.1.0 | 2025-12-23 | 5-column workflow, streamlined stages |
 | 1.0.0 | 2025-10-12 | Initial release |
 
 ---

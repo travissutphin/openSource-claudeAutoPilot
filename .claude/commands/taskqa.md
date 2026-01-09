@@ -369,6 +369,7 @@ NEXT:
 
 ## VERSION HISTORY
 
+- v4.0.0 (2026-01-08): Updated for 5-column workflow (Sprint → QA)
 - v3.0.0 (2025-12-22): Updated for 7-column workflow (Review → QA)
 - v2.0.0 (2025-12-22): Added security review, enhanced code review, DevOps best practices
 - v1.0.0 (2025-10-12): Initial release
@@ -376,5 +377,5 @@ NEXT:
 ---
 
 **Command Status**: PRODUCTION READY
-**Last Updated**: 2025-12-22
+**Last Updated**: 2026-01-08
 **Maintainer**: [Codey] (TPM)

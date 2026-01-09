@@ -1,7 +1,7 @@
 # Task Lifecycle - DevOps Best Practices
 
-**Version**: 2.0.0
-**Purpose**: Standard 7-stage workflow every task follows from Backlog to Done
+**Version**: 3.0.0
+**Purpose**: Standard 5-stage workflow every task follows from Backlog to Done
 **Maintained by**: [Flow] (DevOps), [Codey] (TPM)
 
 ---
@@ -11,19 +11,19 @@
 Every task follows this lifecycle:
 
 ```
-┌─────────┐   ┌───────┐   ┌─────────────┐   ┌────────┐   ┌─────┐   ┌─────────┐   ┌──────┐
-│ BACKLOG │──►│ READY │──►│ IN PROGRESS │──►│ REVIEW │──►│ QA  │──►│ STAGING │──►│ DONE │
-└─────────┘   └───────┘   └─────────────┘   └────────┘   └─────┘   └─────────┘   └──────┘
-     │             │              │              │           │           │           │
-  Prioritize  [TaskStart]    Development   [TaskReview]  [TaskQA]  [TaskStage] [TaskComplete]
+┌─────────┐   ┌────────┐   ┌─────┐   ┌────────┐   ┌──────┐
+│ BACKLOG │──►│ SPRINT │──►│ QA  │──►│ STAGED │──►│ DONE │
+└─────────┘   └────────┘   └─────┘   └────────┘   └──────┘
+     │             │           │           │           │
+  Prioritize  [TaskStart]  [TaskQA]   [TaskStage] [TaskComplete]
 ```
 
 ---
 
-## Stage 1: BACKLOG → READY
+## Stage 1: BACKLOG → SPRINT
 
 ### Purpose
-Move refined, prioritized tasks that are ready to be picked up.
+Move refined, prioritized tasks into active development.
 
 ### Entry Criteria
 - Task has clear title and description
@@ -31,26 +31,12 @@ Move refined, prioritized tasks that are ready to be picked up.
 - Dependencies identified
 - Estimated (story points or T-shirt size)
 
-### Actions
-1. Product Owner prioritizes task
-2. Task is refined with enough detail to start
-3. Move card to Ready column
-
-### Definition of "Ready"
-- Clear acceptance criteria
-- No blocking dependencies
-- Developer can start without questions
-
----
-
-## Stage 2: READY → IN PROGRESS
-
 ### Trigger
 User runs `[TaskStart]` or says "start task #X"
 
 ### What Happens
 1. **Validate Selection**
-   - Task exists in Ready column
+   - Task exists in Backlog column
    - No WIP limit exceeded
 
 2. **Create Feature Branch**
@@ -62,7 +48,7 @@ User runs `[TaskStart]` or says "start task #X"
    ```
 
 3. **Update Kanban**
-   - Move card: Ready → In Progress
+   - Move card: Backlog → Sprint
    - Add start date
    - Assign developer
 
@@ -79,14 +65,14 @@ User runs `[TaskStart]` or says "start task #X"
 | Push immediately | Backup + visibility |
 | WIP limit | Focus on completing before starting |
 
-### Definition of "In Progress"
+### Definition of "Sprint"
 - Developer actively working
 - Local environment functional
 - Feature branch created
 
 ---
 
-## Stage 3: IN PROGRESS → REVIEW
+## Stage 2: SPRINT → QA
 
 ### Trigger
 User runs `[TaskReview]` or says "ready for review"
@@ -105,50 +91,24 @@ User runs `[TaskReview]` or says "ready for review"
    gh pr create --title "#[ID] - [Title]"
    ```
 
-3. **Update Kanban**
-   - Move card: In Progress → Review
-   - Attach PR link
-   - Assign reviewer
-
-### DevOps Best Practices
-| Practice | Why |
-|----------|-----|
-| Small PRs | Easier to review, faster feedback |
-| Self-review first | Catch obvious issues |
-| Clear PR description | Context for reviewers |
-
-### Definition of "In Review"
-- PR created
-- Assigned to reviewer
-- Ready for code review
-
----
-
-## Stage 4: REVIEW → QA
-
-### Trigger
-User runs `[TaskQA]` or code review is approved
-
-### What Happens
-
-1. **Code Review** ([Syntax])
+3. **Code Review** ([Syntax])
    - Follows project patterns
    - No unnecessary complexity
    - Proper error handling
    - No hardcoded values
 
-2. **Security Review** ([Sentinal])
+4. **Security Review** ([Sentinal])
    - Input validation (XSS, SQL injection)
    - No secrets in code
    - Proper authentication/authorization
    - npm audit clean
 
-3. **Update Kanban**
-   - Move card: Review → QA
-   - Code review status: Approved
+5. **Update Kanban**
+   - Move card: Sprint → QA
+   - Attach PR link
    - Assign to [Verity]
 
-4. **Generate QA Test Brief**
+6. **Generate QA Test Brief**
    - What to test
    - How to access
    - Edge cases to verify
@@ -156,18 +116,19 @@ User runs `[TaskQA]` or code review is approved
 ### DevOps Best Practices
 | Practice | Why |
 |----------|-----|
-| Code review every PR | Knowledge sharing, quality |
+| Small PRs | Easier to review, faster feedback |
+| Self-review first | Catch obvious issues |
+| Clear PR description | Context for reviewers |
 | Security review | Shift-left security |
-| Test brief | Consistent testing |
 
-### Definition of "In QA"
-- Code review approved
+### Definition of "QA"
+- PR created and reviewed
 - Security review passed
 - Ready for testing
 
 ---
 
-## Stage 5: QA → STAGING
+## Stage 3: QA → STAGED
 
 ### Trigger
 User runs `[TaskStage]` or QA says "testing complete"
@@ -198,7 +159,7 @@ User runs `[TaskStage]` or QA says "testing complete"
    - Feature works in staging environment
 
 5. **Update Kanban**
-   - Move card: QA → Staging
+   - Move card: QA → Staged
    - Add staging URL
    - Log deployment
 
@@ -209,7 +170,7 @@ User runs `[TaskStage]` or QA says "testing complete"
 | Staging environment | Test in production-like environment |
 | Health checks | Verify deployment succeeded |
 
-### Definition of "Staging"
+### Definition of "Staged"
 - QA testing passed
 - Merged to main
 - Deployed to staging
@@ -217,7 +178,7 @@ User runs `[TaskStage]` or QA says "testing complete"
 
 ---
 
-## Stage 6: STAGING → DONE
+## Stage 4: STAGED → DONE
 
 ### Trigger
 User runs `[TaskComplete]` after stakeholder approval
@@ -240,7 +201,7 @@ User runs `[TaskComplete]` after stakeholder approval
    - Monitoring shows no errors
 
 4. **Update Kanban**
-   - Move card: Staging → Done
+   - Move card: Staged → Done
    - Add completion date
    - Mark as completed
 
@@ -275,12 +236,10 @@ User runs `[TaskComplete]` after stakeholder approval
 
 | Stage | Command | Lead | Support |
 |-------|---------|------|---------|
-| Backlog → Ready | (manual prioritization) | [PRODUCT_OWNER] | [Codey] |
-| Ready → In Progress | `[TaskStart]` | [Codey] | [Flow] |
-| In Progress → Review | `[TaskReview]` | [Syntax] | Developer |
-| Review → QA | `[TaskQA]` | [Codey] | [Syntax], [Sentinal] |
-| QA → Staging | `[TaskStage]` | [Flow] | [Verity] |
-| Staging → Done | `[TaskComplete]` | [Flow] | [Codey] |
+| Backlog → Sprint | `[TaskStart]` | [Codey] | [Flow] |
+| Sprint → QA | `[TaskReview]` | [Syntax] | [Sentinal] |
+| QA → Staged | `[TaskStage]` | [Flow] | [Verity] |
+| Staged → Done | `[TaskComplete]` | [Flow] | [Codey] |
 
 ---
 
@@ -293,22 +252,18 @@ Each stage has a "quality gate" - requirements that must be met before proceedin
 - [ ] Dependencies identified
 - [ ] Design approved (if UI work)
 
-### Gate 2: Ready for Review
+### Gate 2: Ready for QA
 - [ ] All acceptance criteria implemented
 - [ ] Code compiles without errors
-- [ ] Self-review completed
-
-### Gate 3: Ready for QA
 - [ ] Code review approved
 - [ ] Security review approved
-- [ ] PR created
 
-### Gate 4: Ready for Staging
+### Gate 3: Ready for Staging
 - [ ] QA testing complete
 - [ ] No blocking bugs
 - [ ] Cross-browser verified
 
-### Gate 5: Ready for Production
+### Gate 4: Ready for Production
 - [ ] Staging verification complete
 - [ ] Stakeholder approved
 - [ ] Rollback plan documented
@@ -358,11 +313,12 @@ git checkout [previous-tag]
 
 ## Version History
 
+- v3.0.0 (2026-01-08): Simplified to 5-column workflow (Backlog → Sprint → QA → Staged → Done)
 - v2.0.0 (2025-12-22): Updated to 7-column workflow (Backlog → Ready → In Progress → Review → QA → Staging → Done)
 - v1.0.0 (2025-12-22): Initial release with 5-column workflow
 
 ---
 
 **Document Status**: PRODUCTION READY
-**Last Updated**: 2025-12-22
+**Last Updated**: 2026-01-08
 **Maintainer**: [Flow] (DevOps), [Codey] (TPM)
