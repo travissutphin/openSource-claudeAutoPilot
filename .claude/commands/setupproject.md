@@ -1,16 +1,21 @@
 # [SetupProject] - New Project Setup
 
-**Version**: 2.2.0
+**Version**: 3.1.0
 **Command**: `[SetupProject]` or `/setupproject`
 **Trigger**: Run when starting a new project or when [StartDay] detects unconfigured project
-**Purpose**: Read PRD to extract project info, confirm with user, generate config files
+**Purpose**: Read PRD to extract project info, validate quality, confirm with user, generate config files safely
 **Executor**: [Codey] (TPM) with [PRODUCT_OWNER]
 
 ---
 
 ## AUTO-EXECUTION INSTRUCTIONS
 
-**This is a PRD-DRIVEN workflow. Look for PRD first, extract info, confirm, then generate files.**
+**This is a PRD-DRIVEN workflow with validation. Look for PRD first, validate quality, extract info, confirm in ONE interaction, preview changes, then generate files with backup.**
+
+**Key Improvements in v3.1:**
+1. **Single Smart Form** - All questions in one interaction (not 4+ rounds)
+2. **PRD Validation** - Quality check before task extraction
+3. **Safe File Generation** - Preview changes, automatic backups, preserves customizations
 
 ---
 
@@ -61,35 +66,13 @@ fi
 ```
 
 ### If PRD Found:
-```
-PROJECT SETUP
-==============
-
-I found your PRD: [PRD_FILE]
-
-Let me extract project information...
-
-EXTRACTED FROM PRD:
--------------------
-- Project Name: [extracted from # heading or ## Overview]
-- Description: [extracted from Overview section]
-- Tech Stack: [extracted from ## Technical Requirements]
-- Database: [extracted from tech requirements]
-
-SPRINTS/MILESTONES IDENTIFIED:
-------------------------------
-[For each ## Milestone or ## Sprint or ## Phase section found:]
-- Sprint 1: [Name] - [X] tasks
-- Sprint 2: [Name] - [X] tasks
-- Sprint 3: [Name] - [X] tasks
-
-TOTAL: [X] tasks across [Y] sprints
-
-Is this correct? (yes / no / let me clarify)
+Use the PRD validator to analyze and extract data:
+```bash
+node .autopilot/automation/prd-validator.js "$PRD_FILE" --setup-data > /tmp/prd-data.json
+node .autopilot/automation/prd-validator.js "$PRD_FILE" --score
 ```
 
-If user says YES → Skip to STEP 1B (just ask for missing info like URLs, owner name)
-If user says NO → Proceed to STEP 1A (ask all questions manually)
+Then proceed to **STEP 1B** (Smart Setup Form with PRD data pre-filled).
 
 ### If No PRD Found:
 ```
@@ -140,113 +123,242 @@ Let's set up your project. I'll ask a few questions.
 3. Brief description of what you're building?
 ```
 
-Wait for answers before proceeding to STEP 2.
+Wait for answers, then proceed to the **Smart Setup Form** (Step 1B) with manual answers pre-filled.
 
 ---
 
-## STEP 1B: PRD-Assisted Setup
+## STEP 1B: UNIFIED SETUP CONFIRMATION (Smart Form)
 **Executor**: [Codey]
 
-### Ask Only Missing Info:
+**Purpose**: Collect ALL setup information in ONE interaction instead of 4+ separate rounds.
+
+### 1B.1 Build the Smart Form
+
+Using PRD data (if available) and any manual answers, construct this form:
+
 ```
-ADDITIONAL INFO NEEDED
-=======================
+╔══════════════════════════════════════════════════════════════════╗
+║                    SETUP CONFIRMATION                             ║
+║         ✓ = Extracted from PRD  |  ○ = Needs your input          ║
+╠══════════════════════════════════════════════════════════════════╣
+║                                                                   ║
+║ PROJECT                                                           ║
+║ ─────────────────────────────────────────────────────────────────║
+║ [✓/○] Name: {prd.name || "_______________"}                      ║
+║ [✓/○] Description: {prd.description || "_______________"}        ║
+║   ○   Your name (Product Owner): _______________                 ║
+║   ○   GitHub repo: _______________                               ║
+║                                                                   ║
+║ TECH STACK                                                        ║
+║ ─────────────────────────────────────────────────────────────────║
+║ [✓/○] Framework: {prd.tech.framework || "_______________"}       ║
+║ [✓/○] CSS: {prd.tech.css || "Tailwind CSS"}                      ║
+║ [✓/○] Database: {prd.tech.database || "_______________"}         ║
+║   ○   Local port [3000]: ___                                     ║
+║                                                                   ║
+║ URLS                                                              ║
+║ ─────────────────────────────────────────────────────────────────║
+║   ○   Local URL [http://localhost:3000]: ___                     ║
+║   ○   Production URL: _______________                            ║
+║                                                                   ║
+║ SERVICES (check what you'll use)                                  ║
+║ ─────────────────────────────────────────────────────────────────║
+║ [ ] Database connection (DATABASE_URL)                           ║
+║ [ ] Authentication (NextAuth/Auth.js/Clerk)                      ║
+║ [ ] Payments (Stripe)                                            ║
+║ [ ] Email service (Resend/SendGrid/Postmark)                     ║
+║ [ ] File storage (S3/Cloudinary/Uploadthing)                     ║
+║ [ ] Other API keys: _______________                              ║
+║                                                                   ║
+╚══════════════════════════════════════════════════════════════════╝
 
-I extracted most info from your PRD. Just need a few more details:
-
-1. What's your name? (You'll be the Product Owner)
-
-2. Local development URL?
-   Example: http://localhost:3000
-
-3. Production URL (if known)?
-   Example: https://myproject.com
-   (Type "unknown" if you don't have one yet)
-
-4. GitHub repository URL?
-   Example: https://github.com/username/project
-   (Type "later" to skip for now)
+Ready? (yes / adjust [field] / help)
 ```
 
-Skip to STEP 4 (Environment Variables) after answers.
+### 1B.2 PRD Field Extraction Mapping
+
+| Form Field | PRD Location to Check | Pattern |
+|------------|----------------------|---------|
+| Name | First H1, `## Project Name` | `^#\s+(.+)` |
+| Description | `## Overview`, first paragraph | First 200 chars after title |
+| Framework | `## Technical`, keywords | Next.js, React, Vue, etc. |
+| CSS | Keywords in tech section | Tailwind, Bootstrap, etc. |
+| Database | Keywords in tech section | PostgreSQL, MySQL, MongoDB, etc. |
+
+### 1B.3 Response Handling
+
+**If user says "yes"**:
+- Store all collected data
+- Proceed to Step 2 (PRD Health Check)
+
+**If user says "adjust [field]"**:
+- Accept correction for that specific field
+- Re-display updated form
+- Confirm again
+
+**If user provides all values at once** (freeform):
+- Parse freeform response matching to form fields
+- Confirm the parsed values
+- Proceed when confirmed
+
+### 1B.4 Collected Data Structure
+
+Store all answers in this structure for later use:
+
+```json
+{
+  "collected": {
+    "project": {
+      "name": "TaskFlow Pro",
+      "name_source": "prd",
+      "description": "Project management SaaS",
+      "description_source": "prd",
+      "owner": "John Smith",
+      "owner_source": "user",
+      "repository": "https://github.com/user/taskflow",
+      "repository_source": "user"
+    },
+    "tech_stack": {
+      "framework": "Next.js 14",
+      "framework_source": "prd",
+      "css": "Tailwind CSS",
+      "css_source": "default",
+      "database": "PostgreSQL",
+      "database_source": "prd",
+      "port": 3000,
+      "port_source": "default"
+    },
+    "urls": {
+      "local": "http://localhost:3000",
+      "local_source": "default",
+      "production": "https://taskflow.app",
+      "production_source": "user"
+    },
+    "services": {
+      "database": true,
+      "auth": true,
+      "payments": true,
+      "email": "resend",
+      "storage": false,
+      "other": []
+    }
+  }
+}
+```
 
 ---
 
-## STEP 2: Tech Stack
-**Executor**: [Codey], [Syntax]
-
-### Ask Tech Questions:
-```
-TECH STACK
-===========
-
-4. What's your primary language/framework?
-   Examples: Next.js, PHP, Node.js + Express, React, etc.
-
-5. CSS framework?
-   Examples: Tailwind CSS, Bootstrap, plain CSS
-
-6. Database (if any)?
-   Examples: PostgreSQL, MySQL, MongoDB, none
-
-7. What port for local development?
-   Examples: 3000, 8080, 80
-```
-
-Wait for answers before proceeding.
-
----
-
-## STEP 3: URLs & Repository
+## STEP 2: PRD HEALTH CHECK
 **Executor**: [Codey]
 
-### Ask URL Questions:
-```
-URLS & REPOSITORY
-==================
+**Purpose**: Validate PRD quality and catch issues BEFORE task extraction.
 
-8. Local development URL?
-   Example: http://localhost:3000
+### 2.1 Run PRD Validator
 
-9. Production URL (if known)?
-   Example: https://myproject.com
-   (Type "unknown" if you don't have one yet)
-
-10. GitHub repository URL?
-    Example: https://github.com/username/project
-    (Type "later" to skip for now)
+```bash
+node .autopilot/automation/prd-validator.js "$PRD_FILE" --report
 ```
 
-Wait for answers before proceeding.
+### 2.2 Display Analysis Report
+
+```
+PRD ANALYSIS REPORT
+═══════════════════════════════════════════════════════════
+
+STRUCTURE SCAN:
+✓ Project overview found (line 3)
+✓ Technical requirements section (line 208)
+✓ Features section with 7 features (line 71)
+⚠ No explicit sprints/milestones (will auto-organize)
+✗ Missing: Acceptance criteria for 3/7 features
+
+TASK EXTRACTION PREVIEW:
+Found 23 potential tasks:
+  • 7 from ## Features section (lines 71-204)
+  • 12 from user stories (lines 36-67)
+  • 4 from ## Technical Requirements (lines 208-231)
+
+QUALITY SCORE: 72/100
+  - Structure: 18/25
+  - Completeness: 15/25
+  - Clarity: 22/25
+  - Actionability: 17/25
+
+═══════════════════════════════════════════════════════════
+```
+
+### 2.3 Show Suggestions (if issues found)
+
+If quality score < 80 or critical issues exist:
+
+```
+SUGGESTIONS FOR IMPROVEMENT:
+
+1. 🔴 ADD ACCEPTANCE CRITERIA (3 features missing)
+   Features without criteria: User Profile, Settings, Notifications
+
+   Example format:
+   ### User Profile
+   **Acceptance Criteria:**
+   - [ ] User can view their profile
+   - [ ] User can edit display name
+   - [ ] User can upload avatar
+
+2. 🟡 ORGANIZE INTO MILESTONES
+   Your PRD has no sprint organization. Recommend adding:
+
+   ## Milestone 1: MVP (Core Features)
+   - User Authentication
+   - Dashboard
+   - Basic CRUD
+
+   ## Milestone 2: Growth Features
+   - Team Management
+   - Integrations
+
+3. 🟢 CLARIFY DEPENDENCIES
+   Some features may depend on others. Consider noting:
+   "Depends on: User Authentication"
+```
+
+### 2.4 User Options
+
+```
+OPTIONS:
+─────────────────────────────────────────────────────────────
+[proceed]  Continue with current PRD (23 tasks, auto-organized)
+[enhance]  I'll add structure to your PRD (creates backup first)
+[manual]   Update PRD manually, then re-run /setupproject
+[details]  Show me exactly what will be extracted
+─────────────────────────────────────────────────────────────
+Choose:
+```
+
+### 2.5 Handle Options
+
+**If "proceed"**: Continue to Step 3 (Sprint Extraction)
+
+**If "enhance"**:
+1. Backup original PRD: `cp docs/prd/PRD.md docs/prd/PRD.md.backup.[timestamp]`
+2. Add missing acceptance criteria placeholders
+3. Organize features into logical milestones
+4. Show diff of changes
+5. Confirm save, then continue to Step 3
+
+**If "manual"**: Exit with instructions to re-run after manual PRD edits
+
+**If "details"**: Show full task extraction preview, then return to options
+
+### 2.6 Skip for Manual Setup
+
+If no PRD (Step 1A path), skip Step 2 entirely and proceed to Step 3.
 
 ---
 
-## STEP 4: Environment Variables
-**Executor**: [Codey], [Flow]
-
-### Ask About Required Services:
-```
-ENVIRONMENT VARIABLES
-======================
-
-Which services will your project use? (Answer yes/no for each)
-
-11. Database connection? (DATABASE_URL)
-12. Authentication secrets? (NEXTAUTH_SECRET, etc.)
-13. Email service? (Which one: Resend, SendGrid, etc.)
-14. File storage? (Which one: Cloudinary, AWS S3, etc.)
-15. Payments? (Stripe, etc.)
-16. Any other API keys?
-```
-
-Based on answers, build the list of required env variables.
-
----
-
-## STEP 5: Extract Sprints & Tasks from PRD
+## STEP 3: Extract Sprints & Tasks from PRD
 **Executor**: [Codey]
 
-### 5.1 Parse PRD for Sprints/Milestones:
+### 3.1 Parse PRD for Sprints/Milestones:
 
 Look for these patterns in the PRD to identify sprints:
 - `## Sprint X:` or `## Sprint X -`
@@ -277,7 +389,7 @@ PRD PARSING RULES:
    - Acceptance Criteria: Sub-bullets or checkbox items
 ```
 
-### 5.2 Build Sprint Data Structure:
+### 3.2 Build Sprint Data Structure:
 
 ```json
 {
@@ -313,7 +425,7 @@ PRD PARSING RULES:
 }
 ```
 
-### 5.3 Confirm Sprints with User:
+### 3.3 Confirm Sprints with User:
 
 ```
 SPRINT BREAKDOWN
@@ -345,7 +457,7 @@ Does this breakdown look right?
 - single: Put everything in one sprint
 ```
 
-### 5.4 Handle No Clear Sprints:
+### 3.4 Handle No Clear Sprints:
 
 If PRD has no clear milestone structure:
 ```
@@ -363,82 +475,155 @@ Which approach? (1 / 2 / 3)
 
 ---
 
-## STEP 6: Generate Configuration Files
+## STEP 4: FILE GENERATION PREVIEW
 **Executor**: [Codey]
 
-### 6.1 Generate placeholders.json:
-```bash
-cat > .autopilot/config/placeholders.json << 'EOF'
-{
-  "_comment": "Project configuration - Generated by [SetupProject]",
-  "_version": "2.0.0",
-  "_generated": "[CURRENT_DATE]",
+**Purpose**: Show what will change BEFORE modifying files. Create backups. Allow user to skip specific files.
 
-  "project": {
-    "name": "[collected_name]",
-    "description": "[collected_description]",
-    "repository": "[collected_repo]",
-    "production_url": "[collected_prod_url]",
-    "local_url": "[collected_local_url]"
-  },
+### 4.1 Scan Existing Files
 
-  "tech_stack": {
-    "primary_language": "[collected_language]",
-    "css_framework": "[collected_css]",
-    "database": "[collected_database]",
-    "port": "[collected_port]"
-  },
+Check each target file's current state:
 
-  "team": {
-    "product_owner": "[collected_owner]",
-    "tpm": "Codey",
-    "principal_engineer": "Syntax",
-    "designer": "Aesthetica",
-    "devops": "Flow",
-    "qa": "Verity",
-    "security": "Sentinal",
-    "marketing_seo": "Bran",
-    "content_strategist": "Echo",
-    "storybrand_expert": "Cipher"
-  },
+| File | Check |
+|------|-------|
+| `.autopilot/config/placeholders.json` | Exists? Modified from template? |
+| `.env.example` | Exists? Has custom variables? |
+| `CLAUDE.md` | Exists? Has `# CUSTOM` marker? |
+| `docs/kanban/kanban_dev.html` | Exists? Has tasks? |
 
-  "paths": {
-    "docs_root": "/docs",
-    "kanban_dev": "/docs/kanban/kanban_dev.html",
-    "public_root": "/public"
-  },
+### 4.2 Use File Generator to Plan
 
-  "git": {
-    "main_branch": "main",
-    "feature_prefix": "feature/"
-  },
+```javascript
+const { FileGenerator } = require('.autopilot/automation/file-generator.js');
+const generator = new FileGenerator(projectRoot);
 
-  "setup_tasks": {
-    "env_file": {
-      "required": [true if any env vars needed],
-      "variables": [list of required variables]
-    },
-    "git_init": {
-      "required": true,
-      "remote_url": "[collected_repo]"
-    },
-    "dependencies": {
-      "required": true,
-      "command": "[npm install or composer install]"
-    },
-    "database": {
-      "required": [true if database selected],
-      "migration_command": "[appropriate migration command]"
-    },
-    "dev_server": {
-      "command": "[appropriate dev command]"
-    }
-  }
-}
-EOF
+// Prepare file content
+const files = [
+  { path: '.autopilot/config/placeholders.json', content: placeholdersContent },
+  { path: '.env.example', content: envExampleContent },
+  { path: 'CLAUDE.md', content: claudeContent },
+  { path: 'docs/kanban/kanban_dev.html', content: kanbanContent, description: `(${taskCount} tasks)` }
+];
+
+// Plan operations
+const plan = generator.planOperations(files);
+
+// Show preview
+console.log(generator.generatePreview(plan));
 ```
 
-### 6.2 Generate .env.example (if env vars required):
+### 4.3 Display Preview
+
+```
+╔══════════════════════════════════════════════════════════════════╗
+║                    FILE GENERATION PREVIEW                        ║
+╠══════════════════════════════════════════════════════════════════╣
+║                                                                   ║
+║ WILL CREATE (new files):                                         ║
+║ ─────────────────────────────────────────────────────────────────║
+║ + docs/kanban/kanban_dev.html (23 tasks across 3 sprints)        ║
+║ + .env.example (12 variables)                                    ║
+║                                                                   ║
+║ WILL UPDATE (changes detected):                                   ║
+║ ─────────────────────────────────────────────────────────────────║
+║ ~ .autopilot/config/placeholders.json                            ║
+║   - "name": "[PROJECT_NAME]"                                     ║
+║   + "name": "TaskFlow Pro"                                       ║
+║   - "repository": "[GITHUB_REPO_URL]"                            ║
+║   + "repository": "https://github.com/user/taskflow"             ║
+║   [+14 more field changes]                                       ║
+║                                                                   ║
+║ WILL SKIP (preserving your changes):                              ║
+║ ─────────────────────────────────────────────────────────────────║
+║ = CLAUDE.md (has # CUSTOM marker on line 1)                      ║
+║                                                                   ║
+║ BACKUP LOCATION:                                                  ║
+║ ─────────────────────────────────────────────────────────────────║
+║ .autopilot/backups/20260115_143022/                              ║
+║                                                                   ║
+╚══════════════════════════════════════════════════════════════════╝
+
+OPTIONS:
+─────────────────────────────────────────────────────────────
+[yes]           Proceed with all changes (backup created first)
+[preview FILE]  Show full diff for a specific file
+[skip FILE]     Don't modify that file
+[force FILE]    Overwrite even if custom marker present
+[cancel]        Abort file generation
+─────────────────────────────────────────────────────────────
+Choose:
+```
+
+### 4.4 Handle Options
+
+**If "yes"**: Proceed to Step 5 (Execute File Generation)
+
+**If "preview [file]"**: Show full diff for that file, return to options
+
+**If "skip [file]"**: Add file to skip list, update preview, return to options
+
+**If "force [file]"**: Add file to force list (overwrite despite marker), return to options
+
+**If "cancel"**: Exit setup without generating files
+
+### 4.5 Custom File Markers
+
+Files with these markers in the first 5 lines are automatically skipped:
+
+```markdown
+# CUSTOM - Do not overwrite
+```
+
+```html
+<!-- CUSTOM - Do not overwrite -->
+```
+
+```json
+{ "_custom": true, ...}
+```
+
+```javascript
+// CUSTOM - Do not overwrite
+```
+
+---
+
+## STEP 5: Execute File Generation
+**Executor**: [Codey]
+
+### 5.1 Create Backup First
+
+```javascript
+const results = generator.execute(plan, {
+  skip: userSkipList,
+  force: userForceList
+});
+// Backup created automatically at: results.backupDir
+```
+
+### 5.2 Generate placeholders.json
+
+Use merge logic to preserve custom fields:
+
+```javascript
+const merged = generator.mergePlaceholders(
+  '.autopilot/config/placeholders.json',
+  collectedData
+);
+```
+
+**Always Update** (from setup form):
+- `project.*` (name, description, repository, urls)
+- `tech_stack.*`
+- `team.product_owner`
+
+**Preserve If Customized**:
+- `team.*` (except product_owner)
+- `autonomous_operations.*`
+- `quality_thresholds.*`
+- `environments.*`
+
+### 5.3 Generate .env.example (if env vars required):
 ```bash
 cat > .env.example << 'EOF'
 # [PROJECT_NAME] Environment Variables
@@ -460,16 +645,17 @@ NEXTAUTH_URL="[collected_local_url]"
 EOF
 ```
 
-### 6.3 Generate CLAUDE.md:
+### 5.4 Generate CLAUDE.md:
 Copy from `.autopilot/templates/CLAUDE.md.template` and replace placeholders.
+**Skip if file has CUSTOM marker.**
 
-### 6.4 Create Directory Structure:
+### 5.5 Create Directory Structure:
 ```bash
 mkdir -p docs/kanban
 mkdir -p docs/deployment
 ```
 
-### 6.5 Generate Kanban Board with Sprints:
+### 5.6 Generate Kanban Board with Sprints:
 
 Generate the kanban board from template, creating a tab and board for each sprint:
 
@@ -558,9 +744,22 @@ KANBAN GENERATION PROCESS:
 - Sprint 1 tasks: 001-0XX
 - Sprint 2 tasks: continue from last Sprint 1 ID
 
+### 5.7 Report Results
+
+```
+FILE GENERATION COMPLETE
+=========================
+
+Created: [X] files
+Updated: [Y] files
+Skipped: [Z] files (preserved)
+
+Backup saved to: .autopilot/backups/20260115_143022/
+```
+
 ---
 
-## STEP 7: Offer Automated Setup
+## STEP 6: Offer Automated Setup
 **Executor**: [Flow]
 
 ### Ask User:
@@ -582,7 +781,7 @@ Execute selected commands.
 
 ---
 
-## STEP 8: Summary
+## STEP 7: Summary
 **Executor**: [Codey]
 
 ### Display:
@@ -595,11 +794,14 @@ Owner: [collected_owner]
 Tech: [collected_language] + [collected_css]
 Local URL: [collected_local_url]
 
-FILES CREATED:
+FILES CREATED/UPDATED:
 ✓ placeholders.json
 ✓ CLAUDE.md
 ✓ .env.example
 ✓ kanban_dev.html (with [X] sprints, [Y] tasks in backlog)
+
+BACKUP LOCATION:
+.autopilot/backups/[timestamp]/
 
 SETUP STATUS:
 [List what was done and what still needs manual action]
@@ -614,7 +816,7 @@ REMAINING STEPS:
 
 ---
 
-## STEP 9: Offer Environment Setup
+## STEP 8: Offer Environment Setup
 **Executor**: [Codey]
 
 ### Ask User (Do Not Auto-Execute):
@@ -685,8 +887,47 @@ Based on the primary language, set appropriate defaults:
 
 ---
 
+## AUTOMATION SCRIPTS
+
+### File Generator
+**Path**: `.autopilot/automation/file-generator.js`
+**Purpose**: Safe file generation with backup, preview, and merge logic
+
+```bash
+# List available backups
+node .autopilot/automation/file-generator.js list-backups
+
+# Restore from a backup
+node .autopilot/automation/file-generator.js restore 20260115_143022
+```
+
+### PRD Validator
+**Path**: `.autopilot/automation/prd-validator.js`
+**Purpose**: Analyze PRD structure, extract data, generate improvement suggestions
+
+```bash
+# Full report
+node .autopilot/automation/prd-validator.js docs/prd/PRD.md --report
+
+# Just quality score
+node .autopilot/automation/prd-validator.js docs/prd/PRD.md --score
+
+# Setup form data (JSON)
+node .autopilot/automation/prd-validator.js docs/prd/PRD.md --setup-data
+
+# Suggestions only
+node .autopilot/automation/prd-validator.js docs/prd/PRD.md --suggestions
+```
+
+---
+
 ## VERSION HISTORY
 
+- v3.1.0 (2026-01-15): **Major UX improvements**
+  - Single Smart Form (consolidated 4 question rounds into 1)
+  - PRD Health Check with quality scoring and suggestions
+  - Safe file generation with preview, backup, and merge logic
+  - Added file-generator.js and prd-validator.js automation scripts
 - v3.0.0 (2026-01-03): Sprint/milestone extraction from PRD, generates kanban with sprint tabs and task cards
 - v2.2.0 (2025-12-25): PRD-driven setup - reads PRD first, extracts project info, confirms with user
 - v2.1.0 (2025-12-23): Added Step 8 - offers [SetupEnvironment] at end (user decides)
@@ -696,5 +937,5 @@ Based on the primary language, set appropriate defaults:
 ---
 
 **Command Status**: PRODUCTION READY
-**Last Updated**: 2026-01-03
+**Last Updated**: 2026-01-15
 **Maintainer**: [Codey] (TPM)
