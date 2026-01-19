@@ -36,6 +36,17 @@
     "_description": "Developer done, ready for code review",
     "gates": [
       {
+        "id": "quality_refinement",
+        "name": "Iterative Quality Refinement (IQR)",
+        "auto": true,
+        "required": true,
+        "check_command": "node .autopilot/automation/iterative-refinement.js --auto-analyze --threshold 75",
+        "pass_condition": "exit_code === 0",
+        "on_fail": "iterate_with_suggestions",
+        "max_iterations": 3,
+        "description": "Validates code against learned project patterns for consistency, completeness, security, and maintainability"
+      },
+      {
         "id": "code_committed",
         "name": "All changes committed",
         "auto": true,
