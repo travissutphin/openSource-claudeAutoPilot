@@ -1,0 +1,182 @@
+{
+  "version": "1.0.0",
+  "description": "Configuration for the Iterative Quality Refinement (IQR) system",
+
+  "pattern_detection": {
+    "confidence_threshold": 0.7,
+    "min_files_for_pattern": 3,
+    "max_files_to_scan": 500,
+    "skip_directories": [
+      "node_modules",
+      "vendor",
+      "dist",
+      "build",
+      ".next",
+      "__pycache__",
+      ".git",
+      "coverage",
+      ".autopilot"
+    ],
+    "skip_files": [
+      "*.min.js",
+      "*.min.css",
+      "*.map",
+      "*.lock",
+      "package-lock.json",
+      "yarn.lock",
+      "composer.lock"
+    ]
+  },
+
+  "quality_thresholds": {
+    "minimum_score": 75,
+    "dimensions": {
+      "consistency": {
+        "weight": 0.35,
+        "description": "How well new code matches existing patterns"
+      },
+      "completeness": {
+        "weight": 0.25,
+        "description": "Required elements present (error handling, types, etc.)"
+      },
+      "security": {
+        "weight": 0.25,
+        "description": "No obvious security issues"
+      },
+      "maintainability": {
+        "weight": 0.15,
+        "description": "Code clarity, documentation, complexity"
+      }
+    }
+  },
+
+  "refinement_loop": {
+    "max_iterations": 3,
+    "auto_fix_threshold": 0.9,
+    "require_human_review_below": 60,
+    "iteration_timeout_seconds": 120
+  },
+
+  "pattern_categories": {
+    "naming": {
+      "enabled": true,
+      "check_files": true,
+      "check_functions": true,
+      "check_variables": true,
+      "check_classes": true,
+      "check_constants": true
+    },
+    "structure": {
+      "enabled": true,
+      "check_file_location": true,
+      "check_directory_organization": true,
+      "check_module_boundaries": true
+    },
+    "imports": {
+      "enabled": true,
+      "check_order": true,
+      "check_style": true,
+      "check_aliases": true
+    },
+    "error_handling": {
+      "enabled": true,
+      "check_try_catch": true,
+      "check_error_types": true,
+      "check_logging": true
+    },
+    "comments": {
+      "enabled": true,
+      "check_function_docs": true,
+      "check_inline_style": true,
+      "min_complexity_for_comment": 10
+    },
+    "testing": {
+      "enabled": true,
+      "check_test_location": true,
+      "check_naming_convention": true,
+      "check_structure": true
+    }
+  },
+
+  "tech_stack_hints": {
+    "javascript": {
+      "extensions": [".js", ".jsx", ".mjs"],
+      "config_files": ["package.json", "jsconfig.json"],
+      "common_patterns": {
+        "naming": "camelCase",
+        "components": "PascalCase"
+      }
+    },
+    "typescript": {
+      "extensions": [".ts", ".tsx"],
+      "config_files": ["tsconfig.json"],
+      "common_patterns": {
+        "naming": "camelCase",
+        "components": "PascalCase",
+        "types": "PascalCase",
+        "interfaces": "IPascalCase or PascalCase"
+      }
+    },
+    "python": {
+      "extensions": [".py"],
+      "config_files": ["requirements.txt", "pyproject.toml", "setup.py"],
+      "common_patterns": {
+        "naming": "snake_case",
+        "classes": "PascalCase",
+        "constants": "UPPER_SNAKE_CASE"
+      }
+    },
+    "php": {
+      "extensions": [".php"],
+      "config_files": ["composer.json"],
+      "common_patterns": {
+        "naming": "camelCase",
+        "classes": "PascalCase",
+        "constants": "UPPER_SNAKE_CASE"
+      }
+    },
+    "ruby": {
+      "extensions": [".rb", ".erb"],
+      "config_files": ["Gemfile"],
+      "common_patterns": {
+        "naming": "snake_case",
+        "classes": "PascalCase",
+        "constants": "UPPER_SNAKE_CASE"
+      }
+    },
+    "go": {
+      "extensions": [".go"],
+      "config_files": ["go.mod"],
+      "common_patterns": {
+        "naming": "camelCase",
+        "exported": "PascalCase",
+        "packages": "lowercase"
+      }
+    },
+    "rust": {
+      "extensions": [".rs"],
+      "config_files": ["Cargo.toml"],
+      "common_patterns": {
+        "naming": "snake_case",
+        "types": "PascalCase",
+        "constants": "UPPER_SNAKE_CASE"
+      }
+    }
+  },
+
+  "output": {
+    "report_format": "json",
+    "include_suggestions": true,
+    "include_examples": true,
+    "max_suggestions_per_category": 5,
+    "save_pattern_cache": true,
+    "pattern_cache_ttl_hours": 24
+  },
+
+  "integration": {
+    "block_review_on_failure": true,
+    "auto_create_issues": false,
+    "notify_on_low_score": true,
+    "low_score_threshold": 50
+  }
+}

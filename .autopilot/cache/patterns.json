@@ -1,0 +1,196 @@
+{
+  "project_root": "/home/travis/projects/claudeAutoPilot-App",
+  "analyzed_at": "2026-01-19T01:33:49.585Z",
+  "tech_stack": {
+    "languages": [],
+    "frameworks": [],
+    "testing": [],
+    "database": [],
+    "detected_at": "2026-01-19T01:33:49.583Z"
+  },
+  "file_count": 6,
+  "patterns": {
+    "naming": {
+      "counts": {
+        "files": {
+          "camelCase": 0,
+          "PascalCase": 4,
+          "snake_case": 0,
+          "kebab-case": 0,
+          "other": 2
+        },
+        "functions": {
+          "camelCase": 0,
+          "PascalCase": 0,
+          "snake_case": 0,
+          "other": 0
+        },
+        "variables": {
+          "camelCase": 0,
+          "PascalCase": 0,
+          "snake_case": 0,
+          "UPPER_CASE": 0,
+          "other": 0
+        },
+        "classes": {
+          "PascalCase": 0,
+          "other": 0
+        },
+        "constants": {
+          "UPPER_CASE": 0,
+          "other": 0
+        },
+        "examples": {
+          "files": [
+            {
+              "name": ".gitignore",
+              "case": "other"
+            },
+            {
+              "name": "CONTRIBUTING.md",
+              "case": "PascalCase"
+            },
+            {
+              "name": "LICENSE",
+              "case": "PascalCase"
+            },
+            {
+              "name": "README.md",
+              "case": "PascalCase"
+            },
+            {
+              "name": ".gitkeep",
+              "case": "other"
+            }
+          ],
+          "functions": [],
+          "variables": [],
+          "classes": [],
+          "constants": []
+        }
+      },
+      "dominant": {
+        "files": {
+          "pattern": "PascalCase",
+          "confidence": 0.6666666666666666,
+          "total_samples": 6
+        }
+      },
+      "examples": {
+        "files": [
+          {
+            "name": ".gitignore",
+            "case": "other"
+          },
+          {
+            "name": "CONTRIBUTING.md",
+            "case": "PascalCase"
+          },
+          {
+            "name": "LICENSE",
+            "case": "PascalCase"
+          },
+          {
+            "name": "README.md",
+            "case": "PascalCase"
+          },
+          {
+            "name": ".gitkeep",
+            "case": "other"
+          }
+        ],
+        "functions": [],
+        "variables": [],
+        "classes": [],
+        "constants": []
+      }
+    },
+    "structure": {
+      "directories": {},
+      "file_locations": {
+        "": {
+          "primary": ".",
+          "count": 2,
+          "alternatives": [
+            {
+              "dir": "docs/prd",
+              "count": 1
+            }
+          ]
+        },
+        ".md": {
+          "primary": ".",
+          "count": 2,
+          "alternatives": [
+            {
+              "dir": "docs/prd",
+              "count": 1
+            }
+          ]
+        }
+      },
+      "common_structures": []
+    },
+    "imports": {
+      "style": {
+        "absolute": 0,
+        "relative": 0,
+        "alias": 0
+      },
+      "order": [],
+      "grouping": {
+        "detected": false,
+        "groups": []
+      },
+      "examples": []
+    },
+    "error_handling": {
+      "try_catch": {
+        "count": 0,
+        "examples": []
+      },
+      "promise_catch": {
+        "count": 0,
+        "examples": []
+      },
+      "error_types": {},
+      "logging": {
+        "console": 0,
+        "logger": 0,
+        "custom": 0
+      },
+      "error_responses": {
+        "examples": []
+      }
+    },
+    "comments": {
+      "styles": {
+        "jsdoc": 0,
+        "docstring": 0,
+        "inline": 0,
+        "block": 0,
+        "none": 0
+      },
+      "function_docs": {
+        "documented": 0,
+        "undocumented": 0
+      },
+      "examples": []
+    },
+    "testing": {
+      "location": {},
+      "naming": {
+        "suffix_test": 0,
+        "suffix_spec": 0,
+        "prefix_test": 0,
+        "other": 0
+      },
+      "framework_indicators": {},
+      "structure": {
+        "examples": []
+      },
+      "total_test_files": 0
+    }
+  },
+  "analysis_time_ms": 6
+}
