@@ -1,6 +1,10 @@
-# Claude AutoPilot
+<p align="center">
+  <img src="claude-code-autopilot-mark.svg" alt="Claude AutoPilot Logo" width="180" height="180">
+</p>
 
-**Autonomous AI Development Framework for Claude Code**
+<h1 align="center">Claude AutoPilot</h1>
+
+<p align="center"><strong>Autonomous AI Development Framework for Claude Code</strong></p>
 
 Turn a PRD into a production app with AI handling the process. You make decisions. AI does everything else.
 
