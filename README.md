@@ -113,25 +113,23 @@ my-project/
 | `[SetupEnvironment]` | After setup | Provision database, generate secrets |
 | `[StartDay]` | Start of session | Status report, suggest next task |
 | `[TaskStart]` | Begin a task | Create branch, move to In Progress |
-| `[TaskReview]` | Code complete | Create PR, move to Review |
-| `[TaskQA]` | Review approved | Security scan, move to QA |
-| `[TaskStage]` | QA passed | Deploy to staging |
-| `[TaskComplete]` | Ready for prod | Deploy to production (asks approval) |
+| `[TaskQA]` | Code complete | Security scan, code review, move to QA |
+| `[TaskComplete]` | QA passed | Move to Live, update kanban |
+| `[DeployLive]` | Ready for prod | Deploy to production (asks approval) |
 | `[Monitor]` | Runs automatically | Check environments, auto-progress tasks |
 | `[Digest]` | Daily (or manual) | Generate daily summary |
 | `[EndDay]` | End of session | Wrap up, tomorrow's priorities |
 
 ---
 
-## The 5-Stage Workflow
+## The 4-Column Workflow
 
 ```
-Backlog -> Sprint -> QA -> Staged -> Done
-   │         │        │       │        │
-   │         │        │       │        └── Production deployed
-   │         │        │       └── Staging verified, awaiting approval
-   │         │        └── Testing & code review
-   │         └── Active development
+Backlog -> In Progress -> QA -> Live
+   │            │          │      │
+   │            │          │      └── Production deployed
+   │            │          └── Testing, security scan & code review
+   │            └── Active development
    └── All tasks from PRD
 ```
 
