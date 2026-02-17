@@ -19,7 +19,7 @@ Claude AutoPilot is a framework that transforms Claude Code from an assistant in
 
 - Break down the PRD into tasks
 - Create and manage a kanban board
-- Move tasks through a 5-stage DevOps workflow
+- Move tasks through a 4-column DevOps workflow
 - Run tests, security scans, and code reviews automatically
 - Deploy to staging, verify, and request production approval
 - Only notify you when decisions are needed
