@@ -29,11 +29,9 @@ BRANCHES_ACTIVE=$(git branch -r --list | wc -l)
 
 # 2. Kanban status
 BACKLOG=$(count_cards_in_column "backlog")
-READY=$(count_cards_in_column "ready")
 IN_PROGRESS=$(count_cards_in_column "in_progress")
-REVIEW=$(count_cards_in_column "review")
 QA=$(count_cards_in_column "qa")
-STAGING=$(count_cards_in_column "staging")
+LIVE=$(count_cards_in_column "live")
 DONE_TODAY=$(count_cards_completed_today)
 
 # 3. Environment health
@@ -116,12 +114,9 @@ KANBAN STATUS
 | Column      | Count | Change |
 |-------------|-------|--------|
 | Backlog     | [X]   | [+/-Y] |
-| Ready       | [X]   | [+/-Y] |
 | In Progress | [X]   | [+/-Y] |
-| Review      | [X]   | [+/-Y] |
 | QA          | [X]   | [+/-Y] |
-| Staging     | [X]   | [+/-Y] |
-| Done        | [X]   | [+/-Y] |
+| Live        | [X]   | [+/-Y] |
 
 Tasks Completed Today: [count]
 [List task IDs and titles]
@@ -139,9 +134,8 @@ AUTO-ACTIONS TAKEN TODAY
 [List actions AI took autonomously]
 
 Examples:
-- Moved #012 from In Progress to Review (all tests passed)
-- Deployed #011 to staging (QA approved)
-- Updated sitemap.xml (new blog post published)
+- Moved #012 from In Progress to QA (all tests passed)
+- Deployed #011 to production (QA approved)
 - Ran security scan (0 vulnerabilities found)
 - Created branch feature/015-user-settings
 

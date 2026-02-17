@@ -35,14 +35,9 @@ When the user types `[CommandName]` or `/commandname`, read and execute the corr
 | `[Digest]` | `.claude/commands/digest.md` |
 | `[EndDay]` | `.claude/commands/endday.md` |
 
-### Site-Specific Commands (in .claude/commands/site-specific/):
+### Deployment Commands (in .claude/commands/site-specific/):
 | Command | File |
 |---------|------|
-| `[CreateBlogPost]` | `createblogpost.md` |
-| `[CreateCaseStudy]` | `createcasestudy.md` |
-| `[CreateServicePage]` | `createservicepage.md` |
-| `[RunSEOAudit]` | `runseoaudit.md` |
-| `[GenerateSitemap]` | `generatesitemap.md` |
 | `[DeployLive]` | `deploylive.md` |
 
 ---

@@ -2,8 +2,8 @@
 
 **Version**: 3.0.0
 **Command**: `[TaskQA]` or `/taskqa`
-**Trigger**: When code review is approved, ready for QA testing
-**Purpose**: Security scan, move from Review to QA, hand off to testers
+**Trigger**: When development is complete, ready for QA testing
+**Purpose**: Code review, security scan, move from In Progress to QA, hand off to testers
 **Executor**: [Codey] (Lead), [Sentinal] (Security), [Verity] (QA)
 
 ---
@@ -12,7 +12,7 @@
 
 When user says "ready for QA" or "[TaskQA]", execute this workflow.
 
-**Prerequisite**: Code review must be approved (task in Review column).
+**Prerequisite**: Development must be complete (task in In Progress column).
 
 ---
 
@@ -235,7 +235,7 @@ Branch: [branch] → main
 KANBAN UPDATE
 ==============
 Task: #[ID] - [Title]
-From: Review → To: QA
+From: In Progress → To: QA
 
 Added:
 - PR link: #[PR_NUMBER]
@@ -369,6 +369,7 @@ NEXT:
 
 ## VERSION HISTORY
 
+- v5.0.0 (2026-02-17): Aligned with 4-column workflow (In Progress → QA)
 - v4.0.0 (2026-01-08): Updated for 5-column workflow (Sprint → QA)
 - v3.0.0 (2025-12-22): Updated for 7-column workflow (Review → QA)
 - v2.0.0 (2025-12-22): Added security review, enhanced code review, DevOps best practices

@@ -417,13 +417,15 @@ function commandExists(cmd) {
 }
 
 /**
- * Generate a random password
+ * Generate a cryptographically secure random password
  */
 function generatePassword(length) {
+    const crypto = require('crypto');
     const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const bytes = crypto.randomBytes(length);
     let password = '';
     for (let i = 0; i < length; i++) {
-        password += chars.charAt(Math.floor(Math.random() * chars.length));
+        password += chars.charAt(bytes[i] % chars.length);
     }
     return password;
 }

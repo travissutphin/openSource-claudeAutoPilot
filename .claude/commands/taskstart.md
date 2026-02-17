@@ -2,7 +2,7 @@
 
 **Version**: 2.0.0
 **Command**: `[TaskStart]` or `/taskstart`
-**Trigger**: When starting work on a task from Ready column
+**Trigger**: When starting work on a task from Backlog column
 **Purpose**: Move task to In Progress, create feature branch, set up for development
 **Executor**: [Codey] (Lead), [Flow] (Support), [Syntax] (Support)
 
@@ -19,17 +19,17 @@ When user says "start task #X" or "[TaskStart] #X", execute this workflow.
 
 ### Actions:
 1. Read kanban board
-2. Find task in Ready column
+2. Find task in Backlog column
 3. Verify no other tasks currently in In Progress (WIP limit)
 
 ### Check:
 ```
-IF task not in Ready:
-   → "Task #[ID] is not in Ready. It's currently in [column]."
+IF task not in Backlog:
+   → "Task #[ID] is not in Backlog. It's currently in [column]."
 
 IF another task already in In Progress:
    → "You already have #[ID] in progress.
-      Complete that first, or move it back to Ready?"
+      Complete that first, or move it back to Backlog?"
 ```
 
 ### Output:
@@ -82,7 +82,7 @@ Ready to develop!
 **Executor**: [Codey]
 
 ### Actions:
-1. Move task card from "Ready" to "In Progress"
+1. Move task card from "Backlog" to "In Progress"
 2. Add start date to card
 3. Assign to current developer
 
@@ -187,6 +187,7 @@ git rebase origin/main
 
 ## VERSION HISTORY
 
+- v4.0.0 (2026-02-17): Aligned with 4-column workflow (Backlog → In Progress)
 - v3.0.0 (2026-01-08): Updated for 5-column workflow (Backlog → Sprint)
 - v2.0.0 (2025-12-22): Updated for 7-column workflow (Ready → In Progress)
 - v1.0.0 (2025-12-22): Initial release

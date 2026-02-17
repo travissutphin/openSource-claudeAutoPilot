@@ -56,15 +56,13 @@ args.forEach(arg => {
     }
 });
 
-// Column progression map
-const COLUMN_ORDER = ['backlog', 'ready', 'in_progress', 'review', 'qa', 'staging', 'done'];
+// Column progression map (4-column workflow per workflow-states.json)
+const COLUMN_ORDER = ['backlog', 'in_progress', 'qa', 'live'];
 
 const COLUMN_TRANSITIONS = {
-    'ready': 'in_progress',
-    'in_progress': 'review',
-    'review': 'qa',
-    'qa': 'staging',
-    'staging': 'done'
+    'backlog': 'in_progress',
+    'in_progress': 'qa',
+    'qa': 'live'
 };
 
 /**
@@ -321,21 +319,65 @@ function runCommand(command) {
 
 /**
  * Evaluate a pass condition against a result
+ * Uses safe comparison instead of eval() to prevent code injection
  */
 function evaluateCondition(condition, result) {
     if (!condition) return result.exitCode === 0;
 
-    // Replace placeholders in condition
-    const evalCondition = condition
-        .replace('exit_code', result.exitCode)
-        .replace('result_count', result.count)
-        .replace('result', `"${result.output}"`);
+    // Map variable names to their values
+    const vars = {
+        'exit_code': result.exitCode,
+        'result_count': result.count,
+        'result': result.output
+    };
 
-    try {
-        return eval(evalCondition);
-    } catch {
-        return result.exitCode === 0;
+    // Parse simple conditions: "variable operator value" with optional && / ||
+    // Supports: ===, !==, >=, <=, >, <, ==, !=
+    const parts = condition.split(/\s*(&&|\|\|)\s*/);
+    let finalResult = null;
+    let pendingOperator = null;
+
+    for (const part of parts) {
+        if (part === '&&' || part === '||') {
+            pendingOperator = part;
+            continue;
+        }
+
+        const match = part.trim().match(/^(\w+)\s*(===|!==|>=|<=|>|<|==|!=)\s*(.+)$/);
+        if (!match) return result.exitCode === 0;
+
+        const [, varName, operator, rawValue] = match;
+        const left = vars.hasOwnProperty(varName) ? vars[varName] : undefined;
+        if (left === undefined) return result.exitCode === 0;
+
+        // Parse the right-hand value
+        const value = rawValue.replace(/^['"]|['"]$/g, '');
+        const numValue = Number(value);
+        const right = isNaN(numValue) ? value : numValue;
+
+        let comparison;
+        switch (operator) {
+            case '===': comparison = left === right; break;
+            case '!==': comparison = left !== right; break;
+            case '==':  comparison = left == right; break;
+            case '!=':  comparison = left != right; break;
+            case '>=':  comparison = left >= right; break;
+            case '<=':  comparison = left <= right; break;
+            case '>':   comparison = left > right; break;
+            case '<':   comparison = left < right; break;
+            default:    return result.exitCode === 0;
+        }
+
+        if (finalResult === null) {
+            finalResult = comparison;
+        } else if (pendingOperator === '&&') {
+            finalResult = finalResult && comparison;
+        } else if (pendingOperator === '||') {
+            finalResult = finalResult || comparison;
+        }
     }
+
+    return finalResult !== null ? finalResult : result.exitCode === 0;
 }
 
 /**
@@ -362,8 +404,9 @@ async function progressTask(task, fromColumn, toColumn) {
     try {
         execSync(command, { encoding: 'utf8' });
 
-        // Git commit
-        execSync(`git add -A && git commit -m "chore: auto-progress #${task.id} (${fromColumn} → ${toColumn})
+        // Git commit - stage only the kanban file, not everything
+        const kanbanFile = getKanbanPath();
+        execSync(`git add "${kanbanFile}" && git commit -m "chore: auto-progress #${task.id} (${fromColumn} → ${toColumn})
 
 Automated by evaluate-progression.js
 All quality gates passed.
@@ -380,7 +423,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"`, { encoding: 'utf8' });
  */
 function parseKanbanTasks(content) {
     const tasks = [];
-    const columns = ['backlog', 'ready', 'in_progress', 'review', 'qa', 'staging', 'done'];
+    const columns = ['backlog', 'in_progress', 'qa', 'live'];
 
     for (const column of columns) {
         const startMarker = `<!-- KANBAN_${column.toUpperCase()}_START -->`;

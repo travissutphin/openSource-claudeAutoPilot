@@ -50,5 +50,11 @@ temp/
 docs/kanban/kanban_dev.html
 CLAUDE.md
 
+# Windows artifacts
+nul
+
+# Claude Code local settings (user-specific)
+.claude/settings.local.json
+
 # Keep example files
 !.env.example

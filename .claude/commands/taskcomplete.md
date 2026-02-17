@@ -110,23 +110,10 @@ fi
 
 ### Conditional Logic Based on Task Type:
 
-**If Blog Post (check keywords in task title):**
-```bash
-if [[ "$TASK_TITLE" == *"blog"* ]] || [[ "$TASK_TITLE" == *"post"* ]]; then
-    echo "📝 Blog post detected - refreshing sitemap"
-
-    # Update sitemap (if auto-generation not in place)
-    # Add logic here or call external script:
-    # php lib/update-sitemap.php
-
-    echo "✅ Sitemap updated with new blog post"
-fi
-```
-
 **If Deployment (check keywords):**
 ```bash
 if [[ "$TASK_TITLE" == *"deploy"* ]] || [[ "$TASK_TITLE" == *"migration"* ]]; then
-    echo "🚀 Deployment detected - updating deployment history"
+    echo "Deployment detected - updating deployment history"
 
     # Append to deployment history
     DEPLOY_LOG="[DOCS_ROOT]/deployment/deployment-history.md"
@@ -135,24 +122,11 @@ if [[ "$TASK_TITLE" == *"deploy"* ]] || [[ "$TASK_TITLE" == *"migration"* ]]; th
         echo "### $(date '+%Y-%m-%d %H:%M:%S') - Production Deployment"
         echo "**Task**: #$TASK_ID - $TASK_TITLE"
         echo "**Deployer**: $TASK_ASSIGNEE"
-        echo "**Status**: ✅ Success"
+        echo "**Status**: Success"
         echo ""
     } >> "$DEPLOY_LOG"
 
-    echo "✅ Deployment history updated"
-fi
-```
-
-**If Documentation Update:**
-```bash
-if [[ "$TASK_TITLE" == *"doc"* ]] || [[ "$TASK_TITLE" == *"guide"* ]]; then
-    echo "📚 Documentation task detected - syncing docs"
-
-    # Run docs sync script if exists
-    if [ -f "./.autopilot/automation/sync-docs.sh" ]; then
-        ./.autopilot/automation/sync-docs.sh
-        echo "✅ Documentation synced"
-    fi
+    echo "Deployment history updated"
 fi
 ```
 
@@ -169,18 +143,14 @@ git add "[KANBAN_DEV_PATH]"
 # Stage deployment history if updated
 git add "[DOCS_ROOT]/deployment/deployment-history.md" 2>/dev/null || true
 
-# Stage sitemap if updated
-git add "[PUBLIC_ROOT]/sitemap.xml" 2>/dev/null || true
-
 # Create commit with standardized message
 git commit -m "chore: complete task #$TASK_ID - $TASK_TITLE
 
-🤖 Automated by [ProcessTaskComplete]
+Automated by [ProcessTaskComplete]
 
 Changes:
 - Moved task #$TASK_ID to Done column in kanban
 - Updated task status to completed
-$([ -f sitemap-updated ] && echo '- Refreshed sitemap.xml')
 $([ -f deploy-logged ] && echo '- Updated deployment history')
 
 Co-Authored-By: Claude <noreply@anthropic.com>"
@@ -248,17 +218,13 @@ echo "3. Start next task: [StartDay] to see kanban priorities"
    - Status set to "Live"
    - Completion note added
 
-✅ Git Commit:
+Git Commit:
    - Commit: [hash]
    - Files updated: kanban_dev.html[, other files]
    - Ready to push
 
-[If blog post]
-✅ Sitemap Refreshed:
-   - New blog post added to sitemap.xml
-
 [If deployment]
-✅ Deployment History:
+Deployment History:
    - Logged in deployment-history.md
 
 ---
@@ -356,9 +322,7 @@ Edit `/.autopilot/config/placeholders.json`:
 
 ### Customize task detection:
 Edit task type keywords in script:
-- Blog posts: `*blog*`, `*post*`
 - Deployments: `*deploy*`, `*migration*`
-- Documentation: `*doc*`, `*guide*`
 
 ---
 

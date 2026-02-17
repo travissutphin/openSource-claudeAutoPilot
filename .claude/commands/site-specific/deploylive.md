@@ -214,7 +214,7 @@ PROD_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "[PRODUCTION_URL]")
 echo "Homepage: HTTP $PROD_STATUS"
 
 # 2. Key pages check
-PAGES=("/" "/about" "/services" "/contact" "/blog")
+PAGES=("/" "/api/health" "/dashboard" "/login")
 for PAGE in "${PAGES[@]}"; do
     STATUS=$(curl -s -o /dev/null -w "%{http_code}" "[PRODUCTION_URL]$PAGE")
     echo "  $PAGE: HTTP $STATUS"
@@ -446,7 +446,7 @@ Contact [Flow] immediately.
     "deploy_branch": "main",
     "platform": "Railway|Vercel|Manual",
     "backup_path": "/backups",
-    "health_check_pages": ["/", "/about", "/services"],
+    "health_check_pages": ["/", "/api/health", "/dashboard"],
     "notify_on_deploy": true,
     "require_approval": true
   }

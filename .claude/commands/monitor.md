@@ -191,8 +191,8 @@ auto_progress_task() {
         --to-column="$TO_COLUMN" \
         --add-note="Auto-progressed by [Monitor] - all gates passed"
 
-    # Git commit
-    git add -A
+    # Git commit - stage only the kanban file, not everything
+    git add "[KANBAN_DEV_PATH]"
     git commit -m "chore: auto-progress #$TASK_ID ($FROM_COLUMN → $TO_COLUMN)
 
 Automated by [Monitor]

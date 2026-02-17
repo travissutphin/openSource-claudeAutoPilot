@@ -61,28 +61,22 @@ Read kanban file and generate summary:
 ```
 KANBAN_FILE="[KANBAN_DEV_PATH]"
 
-# Count cards in each column
+# Count cards in each column (4-column workflow)
 BACKLOG_COUNT=$(grep -c 'data-id="' <(sed -n '/KANBAN_BACKLOG_START/,/KANBAN_BACKLOG_END/p' "$KANBAN_FILE"))
-READY_COUNT=$(grep -c 'data-id="' <(sed -n '/KANBAN_READY_START/,/KANBAN_READY_END/p' "$KANBAN_FILE"))
 IN_PROGRESS_COUNT=$(grep -c 'data-id="' <(sed -n '/KANBAN_IN_PROGRESS_START/,/KANBAN_IN_PROGRESS_END/p' "$KANBAN_FILE"))
-REVIEW_COUNT=$(grep -c 'data-id="' <(sed -n '/KANBAN_REVIEW_START/,/KANBAN_REVIEW_END/p' "$KANBAN_FILE"))
 QA_COUNT=$(grep -c 'data-id="' <(sed -n '/KANBAN_QA_START/,/KANBAN_QA_END/p' "$KANBAN_FILE"))
-STAGING_COUNT=$(grep -c 'data-id="' <(sed -n '/KANBAN_STAGING_START/,/KANBAN_STAGING_END/p' "$KANBAN_FILE"))
-DONE_COUNT=$(grep -c 'data-id="' <(sed -n '/KANBAN_DONE_START/,/KANBAN_DONE_END/p' "$KANBAN_FILE"))
+LIVE_COUNT=$(grep -c 'data-id="' <(sed -n '/KANBAN_LIVE_START/,/KANBAN_LIVE_END/p' "$KANBAN_FILE"))
 ```
 
 ### Daily Summary:
 ```
 KANBAN SUMMARY:
 - Backlog: [count] tasks
-- Ready: [count] tasks
 - In Progress: [count] tasks
-- Review: [count] tasks
 - QA: [count] tasks
-- Staging: [count] tasks
-- Done: [count] tasks
+- Live: [count] tasks
 
-Active Work Progress: [X]% ([done]/[total active tasks])
+Active Work Progress: [X]% ([live]/[total tasks])
 ```
 
 ---
@@ -246,12 +240,9 @@ KANBAN STATUS:
 | Column      | Count |
 |-------------|-------|
 | Backlog     | [X]   |
-| Ready       | [X]   |
 | In Progress | [X]   |
-| Review      | [X]   |
 | QA          | [X]   |
-| Staging     | [X]   |
-| Done        | [X]   |
+| Live        | [X]   |
 
 Active Work Progress: [X]%
 

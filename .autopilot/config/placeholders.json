@@ -31,16 +31,12 @@
     "devops": "Flow",
     "qa": "Verity",
     "security": "Sentinal",
-    "marketing_seo": "Bran",
-    "content_strategist": "Echo",
-    "storybrand_expert": "Cipher"
   },
 
   "paths": {
     "docs_root": "[DOCS_ROOT_PATH]",
     "kanban_dev": "[KANBAN_DEV_PATH]",
     "kanban_content": "[KANBAN_CONTENT_PATH]",
-    "content_blog": "[BLOG_CONTENT_PATH]",
     "public_root": "[PUBLIC_ROOT_PATH]",
     "automation": "[AUTOMATION_PATH]",
     "decisions": "[DOCS_ROOT_PATH]/decisions"
@@ -148,44 +144,40 @@
   },
 
   "_example_values": {
-    "_comment": "Example from travissutphin.com project",
+    "_comment": "Example from a SaaS application project",
     "project": {
-      "name": "travissutphin.com",
-      "description": "AI-powered portfolio and blog platform",
-      "repository": "https://github.com/travissutphin/travissutphin.com",
-      "production_url": "https://travissutphin.com",
-      "staging_url": "https://staging.travissutphin.com",
-      "local_url": "http://localhost:80"
+      "name": "my-saas-app",
+      "description": "B2B SaaS application with subscription billing",
+      "repository": "https://github.com/company/my-saas-app",
+      "production_url": "https://app.mysaas.com",
+      "staging_url": "https://staging.mysaas.com",
+      "local_url": "http://localhost:3000"
     },
     "tech_stack": {
-      "primary_language": "PHP 8+",
+      "primary_language": "TypeScript/Node.js",
       "css_framework": "Tailwind CSS",
-      "server_type": "XAMPP",
-      "deployment_platform": "Railway",
-      "port": "80",
+      "server_type": "Node.js",
+      "deployment_platform": "Vercel",
+      "port": "3000",
       "database": "PostgreSQL",
-      "orm": "none"
+      "orm": "Prisma"
     },
     "team": {
-      "product_owner": "Travis",
-      "product_owner_email": "travis@example.com",
+      "product_owner": "ProductOwner",
+      "product_owner_email": "owner@example.com",
       "tpm": "Codey",
       "principal_engineer": "Syntax",
       "designer": "Aesthetica",
       "devops": "Flow",
       "qa": "Verity",
-      "security": "Sentinal",
-      "marketing_seo": "Bran",
-      "content_strategist": "Echo",
-      "storybrand_expert": "Cipher"
+      "security": "Sentinal"
     },
     "paths": {
       "docs_root": "/docs",
       "kanban_dev": "/docs/kanban/kanban_dev.html",
-      "kanban_content": "/docs/kanban/kanban_content.html",
-      "content_blog": "/content/blog",
+      "src_root": "/src",
       "public_root": "/public",
-      "automation": "/automation",
+      "automation": "/scripts",
       "decisions": "/docs/decisions"
     },
     "git": {
@@ -195,24 +187,23 @@
     },
     "environments": {
       "local": {
-        "url": "http://localhost:80",
-        "port": "80",
-        "start_command": "XAMPP Apache start",
-        "database_url": "postgresql://localhost:5432/travissutphin_dev"
+        "url": "http://localhost:3000",
+        "port": "3000",
+        "start_command": "npm run dev",
+        "database_url": "postgresql://localhost:5432/mysaas_dev"
       },
       "staging": {
-        "url": "https://staging.travissutphin.com",
+        "url": "https://staging.mysaas.com",
         "branch": "staging",
         "auto_deploy": true,
-        "database_url": "postgresql://staging-db:5432/travissutphin_staging"
+        "database_url": "postgresql://staging-db:5432/mysaas_staging"
       },
       "production": {
-        "url": "https://travissutphin.com",
+        "url": "https://app.mysaas.com",
         "branch": "main",
         "auto_deploy": false,
         "requires_approval": true,
-        "database_url": "postgresql://prod-db:5432/travissutphin_prod",
-        "cdn_url": "https://cdn.travissutphin.com"
+        "database_url": "postgresql://prod-db:5432/mysaas_prod"
       }
     },
     "autonomous_operations": {
@@ -227,7 +218,7 @@
         "digest_enabled": true,
         "digest_time": "09:00",
         "digest_channel": "email",
-        "digest_recipients": ["travis@example.com"],
+        "digest_recipients": ["owner@example.com"],
         "timezone": "America/Chicago"
       }
     }
