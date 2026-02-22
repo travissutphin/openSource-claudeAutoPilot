@@ -168,6 +168,12 @@ Decisions appear in `.autopilot/docs/decisions/pending.md` or your daily digest.
 
 ---
 
+## Resources
+
+- **[Web App Launch Checklist: 18 Steps to Ship](https://aiwhirks.com/insights/web-app-launch-checklist/)** — An opinionated, 18-step framework for launching production-ready web apps. Covers foundation, security, infrastructure, and deployment/monitoring — the same principles that Claude AutoPilot automates for you.
+
+---
+
 ## License
 
 MIT License - Use freely, attribution appreciated.
